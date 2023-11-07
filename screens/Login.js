@@ -1,0 +1,111 @@
+import { View, Text, TextInput, KeyboardAvoidingView, TouchableOpacity, StyleSheet, Touchable, ActivityIndicator, Dimensions } from 'react-native'
+import React, {useState} from 'react'
+import { StatusBar } from 'expo-status-bar';
+import { FIREBASE_AUTH } from '../FirebaseConfig.js';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import stylesFile from '../styles.js'
+import Register from './Register.js';
+const Login = ({navigation}) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const auth = FIREBASE_AUTH;
+
+  const errorHandle = (email, password) => {
+    if (!email || email.length < 3) {
+      setEmailError('Email moet 3 karakters lang zijn')
+    }
+    else {
+      setEmailError('')
+    }
+    if (!password || password.length < 6) {
+      setPasswordError('Wachtwoord moet 3 karakters lang zijn!')
+    }
+    else {
+      setPasswordError('')
+    }
+  }
+  
+  const signIn = async () => {
+    setLoading(true)
+    errorHandle(email, password);
+    if (!emailError && !passwordError) {
+      try {
+        const response = await signInWithEmailAndPassword(auth, email, password)
+        console.log(response)
+      } catch (error) {
+        console.log(error)
+      }
+      finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.titleContainer}>
+        <Text style={stylesFile.title}>Aanmelden</Text>
+      </View>
+      <Text style={stylesFile.text}>Email</Text>
+      <TextInput
+        style={stylesFile.input}
+        value={email}
+        onChangeText={(text => setEmail(text))}
+        placeholder={'...'}
+        autoCapitalize='none'
+        />
+      <Text style={stylesFile.errorMessage}>{emailError}</Text>
+      <Text style={stylesFile.text}>Wachtwoord</Text>
+      <TextInput
+        style={stylesFile.input}
+        value={password}
+        onChangeText={(text => setPassword(text))}
+        placeholder={'...'}
+        secureTextEntry={true}
+        />
+      <Text style={stylesFile.errorMessage}>{passwordError}</Text>
+      {loading ? (
+        <ActivityIndicator size='small' color='#FA9248' />
+      ): (
+        <>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={stylesFile.button}
+              onPress={signIn}
+            >
+              <Text style={stylesFile.buttonTitle}>Aanmelden</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[stylesFile.button, {backgroundColor: '#fff'}]}
+              onPress={() => navigation.navigate('Register')}
+            >
+              <Text style={stylesFile.buttonTitle}>Registeren</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+      <StatusBar style="auto" />
+    </View>
+  )
+}
+
+export default Login
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+  },
+  titleContainer: {
+    alignItems: 'center',
+  },
+  
+  buttonContainer: {
+    alignItems: 'center',
+  },
+});

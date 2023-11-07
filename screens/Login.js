@@ -4,7 +4,19 @@ import { StatusBar } from 'expo-status-bar';
 import { FIREBASE_AUTH } from '../FirebaseConfig.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import stylesFile from '../styles.js'
-import Register from './Register.js';
+
+import * as Crypto from 'expo-crypto';
+
+// Function to hash a password using Expo Crypto
+const hashPassword = async (password) => {
+  const digest = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    password
+  );
+
+  return digest;
+};
+
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -13,7 +25,7 @@ const Login = ({navigation}) => {
   const [loading, setLoading] = useState(false)
   const auth = FIREBASE_AUTH;
 
-  const errorHandle = (email, password) => {
+  const errorHandle = (email, password, error) => {
     if (!email || email.length < 3) {
       setEmailError('Email moet 3 karakters lang zijn')
     }
@@ -26,23 +38,33 @@ const Login = ({navigation}) => {
     else {
       setPasswordError('')
     }
+    if (error) {
+      setEmailError('Onjuiste gegevens');
+      setPasswordError('Onjuiste gegevens');
+    }
+    else {
+      setEmailError('')
+      setPasswordError('')
+    }
   }
   
   const signIn = async () => {
     setLoading(true)
     errorHandle(email, password);
-    if (!emailError && !passwordError) {
-      try {
+    try {
+      if (!emailError && !passwordError) {
         const response = await signInWithEmailAndPassword(auth, email, password)
         console.log(response)
-      } catch (error) {
-        console.log(error)
       }
-      finally {
-        setLoading(false)
-      }
+    } catch (error) {
+      errorHandle(email, password, true);
+      console.log(error);
+    }
+    finally {
+      setLoading(false)
     }
   }
+  
 
   return (
     <View style={styles.container}>

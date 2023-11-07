@@ -66,7 +66,7 @@ const Register = ({navigation}) => {
           firstName: firstName,
           lastName: lastName,
           email: email,
-          password: hashedPassword,
+          // password: hashedPassword,
         });
         console.log("Document written with ID: ", docRef.id);
         const response = await createUserWithEmailAndPassword(auth, email, password)

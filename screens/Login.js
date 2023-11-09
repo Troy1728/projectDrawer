@@ -2,7 +2,7 @@ import { View, Text, TextInput, KeyboardAvoidingView, TouchableOpacity, StyleShe
 import React, {useState} from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { FIREBASE_AUTH } from '../FirebaseConfig.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import stylesFile from '../styles.js'
 
 import * as Crypto from 'expo-crypto';
@@ -51,6 +51,7 @@ const Login = ({navigation}) => {
   const signIn = async () => {
     setLoading(true)
     errorHandle(email, password);
+    
     try {
       if (!emailError && !passwordError) {
         const response = await signInWithEmailAndPassword(auth, email, password)
@@ -65,7 +66,6 @@ const Login = ({navigation}) => {
     }
   }
   
-
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -89,6 +89,8 @@ const Login = ({navigation}) => {
         secureTextEntry={true}
         />
       <Text style={stylesFile.errorMessage}>{passwordError}</Text>
+
+    
       {loading ? (
         <ActivityIndicator size='small' color='#FA9248' />
       ): (

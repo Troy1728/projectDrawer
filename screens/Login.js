@@ -2,6 +2,7 @@ import { View, Text, TextInput, KeyboardAvoidingView, TouchableOpacity, StyleShe
 import React, {useState} from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { FIREBASE_AUTH } from '../FirebaseConfig.js';
+
 import { signInWithEmailAndPassword } from "firebase/auth";
 import stylesFile from '../styles.js'
 
@@ -54,8 +55,10 @@ const Login = ({navigation}) => {
     
     try {
       if (!emailError && !passwordError) {
-        const response = await signInWithEmailAndPassword(auth, email, password)
-        console.log(response)
+        
+            const response = await signInWithEmailAndPassword(auth, email, password)
+            console.log(response)
+           
       }
     } catch (error) {
       errorHandle(email, password, true);

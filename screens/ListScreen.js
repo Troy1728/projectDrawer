@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'rea
 import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { FlatList } from 'react-native-gesture-handler'
-import { FIREBASE_DB } from '../FirebaseConfig'
+import { FIREBASE_DB } from '../FirebaseConfig.js'
 import { collection, getDocs } from 'firebase/firestore'
 import stylesFile from '../styles.js'
 
@@ -32,7 +32,7 @@ const List = ({navigation}) => {
         <ActivityIndicator size='small' color='#FA9248' />
       ): (
         <TouchableOpacity
-          onPress={() => navigation.navigate('Add')}
+          onPress={() => navigation.navigate('AddScreen')}
           style={styles.button}
         >
           <Text style={stylesFile.text}>Add</Text>
@@ -48,7 +48,7 @@ const List = ({navigation}) => {
             <Text style={stylesFile.item}>{item.title}</Text>
             <Text style={stylesFile.item}>{item.content}</Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Edit', {item})}
+              onPress={() => navigation.navigate('EditScreen', {item})}
               style={styles.buttonReverse}
             >
               <Text>Edit</Text>

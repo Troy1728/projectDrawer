@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar'
 import { addDoc, collection } from 'firebase/firestore'
 import { FIREBASE_DB } from '../FirebaseConfig.js'
 import stylesFile from '../styles.js'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 // https://firebase.google.com/docs/firestore/manage-data/add-data
 
 const Add = ({navigation}) => {
@@ -28,8 +29,12 @@ const Add = ({navigation}) => {
           title: title,
           content: content,
         });
+        /* await AsyncStorage.setItem(docRef.id, JSON.stringify({
+          title: title,
+          content: content,
+        })) */
         console.log("Document written with ID: ", docRef.id);
-        navigation.navigate('List')
+        navigation.navigate('ListScreen')
       } catch (error) {
         console.log(error)
       }finally {

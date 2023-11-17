@@ -17,7 +17,7 @@ export default function HomeScreen({ navigation }) {
         <TouchableOpacity style={[styles.halveButton]} onPress={() => navigation.navigate('ProfielScreen')}>
           <Text style={[stylesFile.buttonTitle]}>Profiel</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.halveButton]} onPress={() => navigation.navigate('VoorwaardenScreen')}>
+        <TouchableOpacity style={[styles.halveButton]} onPress={() => navigation.navigate('ConditionScreen')}>
           <Text style={[stylesFile.buttonTitle]}>Voorwaarden</Text>
         </TouchableOpacity>
       </View>

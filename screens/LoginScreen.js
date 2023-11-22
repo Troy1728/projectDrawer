@@ -1,12 +1,20 @@
-import { View, Text, TextInput, KeyboardAvoidingView, TouchableOpacity, StyleSheet, Touchable, ActivityIndicator, Dimensions } from 'react-native'
-import React, {useState} from 'react'
-import { StatusBar } from 'expo-status-bar';
-import { FIREBASE_AUTH } from '../FirebaseConfig.js';
+import {
+  View,
+  Text,
+  TextInput,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
+import React, { useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { FIREBASE_AUTH } from "../FirebaseConfig.js";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import stylesFile from '../styles.js'
+import stylesFile from "../styles.js";
 
-import * as Crypto from 'expo-crypto';
+import * as Crypto from "expo-crypto";
 
 // Function to hash a password using Expo Crypto
 const hashPassword = async (password) => {
@@ -14,61 +22,57 @@ const hashPassword = async (password) => {
     Crypto.CryptoDigestAlgorithm.SHA256,
     password
   );
-
   return digest;
 };
 
-const Login = ({navigation}) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
-  const [loading, setLoading] = useState(false)
+const Login = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [loading, setLoading] = useState(false);
   const auth = FIREBASE_AUTH;
 
   const errorHandle = (email, password, error) => {
     if (!email || email.length < 3) {
-      setEmailError('Email moet 3 karakters lang zijn')
-    }
-    else {
-      setEmailError('')
+      setEmailError("Email moet 3 karakters lang zijn");
+    } else {
+      setEmailError("");
     }
     if (!password || password.length < 6) {
-      setPasswordError('Wachtwoord moet 3 karakters lang zijn!')
-    }
-    else {
-      setPasswordError('')
+      setPasswordError("Wachtwoord moet 3 karakters lang zijn!");
+    } else {
+      setPasswordError("");
     }
     if (error) {
-      setEmailError('Onjuiste gegevens');
-      setPasswordError('Onjuiste gegevens');
+      setEmailError("Onjuiste gegevens");
+      setPasswordError("Onjuiste gegevens");
+    } else {
+      setEmailError("");
+      setPasswordError("");
     }
-    else {
-      setEmailError('')
-      setPasswordError('')
-    }
-  }
-  
+  };
+
   const signIn = async () => {
-    setLoading(true)
+    setLoading(true);
     errorHandle(email, password);
-    
     try {
       if (!emailError && !passwordError) {
-        
-            const response = await signInWithEmailAndPassword(auth, email, password)
-            console.log(response)
-           
+        const response = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        console.log(response);
       }
     } catch (error) {
       errorHandle(email, password, true);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-    finally {
-      setLoading(false)
-    }
-  }
-  
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -78,36 +82,32 @@ const Login = ({navigation}) => {
       <TextInput
         style={stylesFile.input}
         value={email}
-        onChangeText={(text => setEmail(text))}
-        placeholder={'...'}
-        autoCapitalize='none'
-        />
+        onChangeText={(text) => setEmail(text)}
+        placeholder={"..."}
+        autoCapitalize="none"
+      />
       <Text style={stylesFile.errorMessage}>{emailError}</Text>
       <Text style={stylesFile.text}>Wachtwoord</Text>
       <TextInput
         style={stylesFile.input}
         value={password}
-        onChangeText={(text => setPassword(text))}
-        placeholder={'...'}
+        onChangeText={(text) => setPassword(text)}
+        placeholder={"..."}
         secureTextEntry={true}
-        />
+      />
       <Text style={stylesFile.errorMessage}>{passwordError}</Text>
 
-    
       {loading ? (
-        <ActivityIndicator size='small' color='#FA9248' />
-      ): (
+        <ActivityIndicator size="small" color="#FA9248" />
+      ) : (
         <>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={stylesFile.button}
-              onPress={signIn}
-            >
+            <TouchableOpacity style={stylesFile.button} onPress={signIn}>
               <Text style={stylesFile.buttonTitle}>Aanmelden</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[stylesFile.button, {backgroundColor: '#fff'}]}
-              onPress={() => navigation.navigate('RegisterScreen')}
+              style={[stylesFile.button, { backgroundColor: "#fff" }]}
+              onPress={() => navigation.navigate("RegisterScreen")}
             >
               <Text style={stylesFile.buttonTitle}>Registeren</Text>
             </TouchableOpacity>
@@ -116,23 +116,23 @@ const Login = ({navigation}) => {
       )}
       <StatusBar style="auto" />
     </View>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   titleContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
-  
+
   buttonContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
 });

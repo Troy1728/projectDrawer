@@ -1,7 +1,8 @@
-import { View, Text, Button, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, StyleSheet, Dimensions } from 'react-native';
 import React from 'react';
 import stylesFile from '../styles';
-
+import { StatusBar } from 'expo-status-bar';
+ 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={[stylesFile.container]}>
@@ -14,7 +15,7 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
       </View>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <TouchableOpacity style={[styles.halveButton]} onPress={() => navigation.navigate('ProfielScreen')}>
+        <TouchableOpacity style={[styles.halveButton]} onPress={() => navigation.navigate('ProfileScreen')}>
           <Text style={[stylesFile.buttonTitle]}>Profiel</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.halveButton]} onPress={() => navigation.navigate('ConditionScreen')}>
@@ -26,6 +27,7 @@ export default function HomeScreen({ navigation }) {
           <Text style={[stylesFile.buttonTitle]}>Alle Donaties</Text>
         </TouchableOpacity>
       </View>
+      <StatusBar style="auto" />
     </View>
   )
 }

@@ -1,5 +1,4 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
 import { IconButton } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator, HeaderTitle } from "@react-navigation/stack";
@@ -9,6 +8,7 @@ import ListScreen from "./screens/ListScreen.js";
 import AddScreen from "./screens/AddScreen.js";
 import RegisterScreen from "./screens/RegisterScreen.js";
 import ConditionScreen from "./screens/ConditionScreen.js";
+import ProfileScreen from "./screens/ProfileScreen.js";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_AUTH } from "./FirebaseConfig.js";
@@ -16,7 +16,9 @@ import { syncLocalPosts } from "./NetInfo.js";
 const Stack = createStackNavigator();
 const InsideStack = createStackNavigator();
 
-function InsideLayout({navigation}) {
+import CustomHeader from "./atoms/CustomHeader.js";
+
+function InsideLayout({ navigation }) {
   return (
     <InsideStack.Navigator>
       <InsideStack.Screen
@@ -26,27 +28,12 @@ function InsideLayout({navigation}) {
           headerShown: false,
         }}
       />
-
       <InsideStack.Screen
         name="ListScreen"
         component={ListScreen}
         options={{
-          headerTitleAlign: "center",
-          headerTitle: "Alle Donaties",
-          headerStyle: {
-            backgroundColor: "#fff",
-          },
-          headerTintColor: "#FA9248",
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 20,
-          },
-          headerLeft: () => (
-            <IconButton
-              icon="arrow-left-circle"
-              backgroundColor="#FA9248"
-              onPress={() => navigation.goBack()}
-            />
+          header: ({ navigation }) => (
+            <CustomHeader title="Alle Donaties" navigation={navigation} />
           ),
         }}
       />
@@ -54,22 +41,17 @@ function InsideLayout({navigation}) {
         name="AddScreen"
         component={AddScreen}
         options={{
-          headerTitleAlign: "center",
-          headerTitle: "Donatie Aanmaken",
-          headerStyle: {
-            backgroundColor: "#fff",
-          },
-          headerTintColor: "#FA9248",
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 20,
-          },
-          headerLeft: () => (
-            <IconButton
-              icon="arrow-left-circle"
-              backgroundColor="#FA9248"
-              onPress={() => navigation.goBack()}
-            />
+          header: ({ navigation }) => (
+            <CustomHeader title="Donatie Aanmaken" navigation={navigation} />
+          ),
+        }}
+        />
+      <InsideStack.Screen
+        name="ProfileScreen"
+        component={ProfileScreen}
+        options={{
+          header: ({ navigation }) => (
+            <CustomHeader title="Profiel" navigation={navigation} />
           ),
         }}
       />
@@ -77,22 +59,8 @@ function InsideLayout({navigation}) {
         name="ConditionScreen"
         component={ConditionScreen}
         options={{
-          headerTitleAlign: "center",
-          headerTitle: "Voorwaarden",
-          headerStyle: {
-            backgroundColor: "#fff",
-          },
-          headerTintColor: "#FA9248",
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 20,
-          },
-          headerLeft: () => (
-            <IconButton
-              icon="arrow-left-circle"
-              backgroundColor="#FA9248"
-              onPress={() => navigation.goBack()}
-            />
+          header: ({ navigation }) => (
+            <CustomHeader title="Voorwaarden" navigation={navigation} />
           ),
         }}
       />

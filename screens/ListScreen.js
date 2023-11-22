@@ -56,7 +56,7 @@ const List = ({navigation}) => {
           </View>
         )}
       /> 
-      <StatusBar style="auto" />
+      <StatusBar style='auto' />
     </View>
   )
 }

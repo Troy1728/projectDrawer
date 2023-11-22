@@ -85,14 +85,7 @@ const styles = StyleSheet.create({
     margin: 10,
     width: 200
   },
-  button: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderColor: 'black',
-    backgroundColor: '#FA9248',
-    borderWidth: 1,
-    borderRadius: 5,
-  },
+
   errorMessage: {
     color: 'red',
     marginTop: -10,

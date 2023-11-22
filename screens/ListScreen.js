@@ -5,6 +5,7 @@ import { FlatList } from 'react-native-gesture-handler'
 import { FIREBASE_DB } from '../FirebaseConfig.js'
 import { collection, getDocs } from 'firebase/firestore'
 import stylesFile from '../styles.js'
+import CustomButton from '../atoms/CustomButton.js'
 
 const List = ({navigation}) => {
   const [posts, setPosts] = useState([])
@@ -31,12 +32,7 @@ const List = ({navigation}) => {
       {loading ? (
         <ActivityIndicator size='small' color='#FA9248' />
       ): (
-        <TouchableOpacity
-          onPress={() => navigation.navigate('AddScreen')}
-          style={styles.button}
-        >
-          <Text style={stylesFile.text}>Add</Text>
-        </TouchableOpacity>
+        <CustomButton title='Donatie Toevoegen' buttenDesign='fullButton' onPress={() => navigation.navigate('AddScreen')} />
       )}
 
       <FlatList
@@ -47,12 +43,7 @@ const List = ({navigation}) => {
           <View style={styles.postContainer}>
             <Text style={stylesFile.item}>{item.title}</Text>
             <Text style={stylesFile.item}>{item.content}</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('EditScreen', {item})}
-              style={styles.buttonReverse}
-            >
-              <Text>Edit</Text>
-            </TouchableOpacity>
+            <CustomButton title='Edit' buttenDesign='reverseButton' onPress={() => navigation.navigate('EditScreen', {item})} />
           </View>
         )}
       /> 
@@ -64,22 +55,6 @@ const List = ({navigation}) => {
 export default List
 
 const styles = StyleSheet.create({
-  button: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderColor: 'black',
-    backgroundColor: '#FA9248',
-    borderWidth: 2,
-    borderRadius: 5,
-  },
-  buttonReverse: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderColor: 'black',
-    backgroundColor: '#FFF',
-    borderWidth: 2,
-    borderRadius: 10,
-  },
   postContainer: {
     borderWidth: 2,
     borderColor: '#000',

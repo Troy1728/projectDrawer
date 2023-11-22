@@ -5,6 +5,7 @@ import { addDoc, collection } from 'firebase/firestore'
 import { FIREBASE_DB } from '../FirebaseConfig.js'
 import stylesFile from '../styles.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import CustomButton from '../atoms/CustomButton.js'
 // https://firebase.google.com/docs/firestore/manage-data/add-data
 
 const Add = ({navigation}) => {
@@ -62,12 +63,7 @@ const Add = ({navigation}) => {
       {loading ? (
         <ActivityIndicator size='small' color='#FA9248' />
       ): (
-        <TouchableOpacity
-          onPress={AddPost}
-          style={styles.button}
-        >
-          <Text>Submit</Text>
-        </TouchableOpacity>
+        <CustomButton title='Toevoegen' buttenDesign='fullButton' onPress={AddPost} />
       )}
       <StatusBar style="auto" />
     </View>

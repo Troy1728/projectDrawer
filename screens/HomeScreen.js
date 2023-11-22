@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, 
 import React from 'react';
 import stylesFile from '../styles';
 import { StatusBar } from 'expo-status-bar';
- 
+import CustomButton from '../atoms/CustomButton';
 export default function HomeScreen({ navigation }) {
   return (
     <View style={[stylesFile.container]}>
@@ -10,22 +10,18 @@ export default function HomeScreen({ navigation }) {
         <Text style={[stylesFile.title]}>Donator</Text>
       </View>
       <View style={{justifyContent: 'space-evenly'}}>
+        <CustomButton title='Magazijn' buttenDesign='fullButton' onPress={() => navigation.navigate('MagazijnScreen')} />
+        
         <TouchableOpacity style={[styles.button]} onPress={() => navigation.navigate('MagazijnScreen')}>
           <Text style={[stylesFile.buttonTitle]}>Magazijn</Text>
         </TouchableOpacity>
       </View>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <TouchableOpacity style={[styles.halveButton]} onPress={() => navigation.navigate('ProfileScreen')}>
-          <Text style={[stylesFile.buttonTitle]}>Profiel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.halveButton]} onPress={() => navigation.navigate('ConditionScreen')}>
-          <Text style={[stylesFile.buttonTitle]}>Voorwaarden</Text>
-        </TouchableOpacity>
+        <CustomButton title='Profiel' buttenDesign='halfButton' onPress={() => navigation.navigate('ProfileScreen')} />
+        <CustomButton title='Voorwaarden' buttenDesign='halfButton' onPress={() => navigation.navigate('ConditionScreen')} />
       </View>
       <View style={{justifyContent: 'space-evenly'}}>
-        <TouchableOpacity style={[styles.button]} onPress={() => navigation.navigate('ListScreen')}>
-          <Text style={[stylesFile.buttonTitle]}>Alle Donaties</Text>
-        </TouchableOpacity>
+        <CustomButton title='Alle Donaties' buttenDesign='fullButton' onPress={() => navigation.navigate('ListScreen')} />
       </View>
       <StatusBar style="auto" />
     </View>

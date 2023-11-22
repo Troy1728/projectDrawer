@@ -15,6 +15,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import stylesFile from "../styles.js";
 
 import * as Crypto from "expo-crypto";
+import CustomButton from "../atoms/CustomButton.js";
 
 // Function to hash a password using Expo Crypto
 const hashPassword = async (password) => {
@@ -102,15 +103,16 @@ const Login = ({ navigation }) => {
       ) : (
         <>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={stylesFile.button} onPress={signIn}>
-              <Text style={stylesFile.buttonTitle}>Aanmelden</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[stylesFile.button, { backgroundColor: "#fff" }]}
+            <CustomButton
+              title="Aanmelden"
+              buttenDesign="fullButton"
+              onPress={signIn}
+            />
+            <CustomButton
+              title="Registreren"
+              buttenDesign="reverseButton"
               onPress={() => navigation.navigate("RegisterScreen")}
-            >
-              <Text style={stylesFile.buttonTitle}>Registeren</Text>
-            </TouchableOpacity>
+            />
           </View>
         </>
       )}

@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 import stylesFile from '../styles.js'
 import { addDoc, collection } from 'firebase/firestore';
 import * as Crypto from 'expo-crypto';
+import CustomButton from '../atoms/CustomButton.js';
 
 const hashPassword = async (password) => {
   const digest = await Crypto.digestStringAsync(
@@ -138,18 +139,8 @@ const Register = ({navigation}) => {
       ): (
         <>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[stylesFile.button, {backgroundColor: '#fff'}]}
-              onPress={signUp}
-            >
-              <Text style={stylesFile.buttonTitle}>Registeren</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={stylesFile.button}
-              onPress={navigation.goBack}
-            >
-              <Text style={stylesFile.buttonTitle}>Annuleren</Text>
-            </TouchableOpacity>
+           <CustomButton title='Registeren' buttenDesign='fullButton' onPress={signUp} />
+           <CustomButton title='Annuleren' buttenDesign='reverseButton' onPress={navigation.goBack} />
           </View>
         </>
       )}

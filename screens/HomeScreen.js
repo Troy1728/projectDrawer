@@ -9,19 +9,35 @@ export default function HomeScreen({ navigation }) {
       <View style={[styles.titleContainer]}>
         <Text style={[stylesFile.title]}>Donator</Text>
       </View>
-      <View style={{justifyContent: 'space-evenly'}}>
-        <CustomButton title='Magazijn' buttenDesign='fullButton' onPress={() => navigation.navigate('MagazijnScreen')} />
+      <View style={{ justifyContent: "space-evenly" }}>
+        <CustomButton
+          title="Magazijn"
+          buttonDesign="fullButton"
+          onPress={() => navigation.navigate("MagazijnScreen")}
+        />
       </View>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <CustomButton title='Profiel' buttenDesign='halfButton' onPress={() => navigation.navigate('ProfileScreen')} />
-        <CustomButton title='Voorwaarden' buttenDesign='halfButton' onPress={() => navigation.navigate('ConditionScreen')} />
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <CustomButton
+          title="Profiel"
+          buttonDesign="halfButton"
+          onPress={() => navigation.navigate("ProfileScreen")}
+        />
+        <CustomButton
+          title="Voorwaarden"
+          buttonDesign="halfButton"
+          onPress={() => navigation.navigate("ConditionScreen")}
+        />
       </View>
-      <View style={{justifyContent: 'space-evenly'}}>
-        <CustomButton title='Alle Donaties' buttenDesign='fullButton' onPress={() => navigation.navigate('ListScreen')} />
+      <View style={{ justifyContent: "space-evenly" }}>
+        <CustomButton
+          title="Alle Donaties"
+          buttonDesign="fullButton"
+          onPress={() => navigation.navigate("ListScreen")}
+        />
       </View>
       <StatusBar style="auto" />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({

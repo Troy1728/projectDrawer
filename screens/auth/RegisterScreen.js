@@ -1,12 +1,12 @@
 import { View, Text, TextInput, KeyboardAvoidingView, SecureStore, TouchableOpacity, StyleSheet, Touchable, ActivityIndicator, Dimensions } from 'react-native'
 import React, {useState} from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../FirebaseConfig.js';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import stylesFile from '../styles.js'
+import stylesFile from '../../styles.js'
 import { addDoc, collection } from 'firebase/firestore';
 import * as Crypto from 'expo-crypto';
-import CustomButton from '../atoms/CustomButton.js';
+import CustomButton from '../../atoms/CustomButton.js';
 
 const hashPassword = async (password) => {
   const digest = await Crypto.digestStringAsync(
@@ -93,23 +93,23 @@ const Register = ({navigation}) => {
             <TextInput
               style={[stylesFile.input, styles.inputLeft]}
               value={firstName}
-              onChangeText={(text => setFirstName(text))}
-              placeholder={'...'}
-              autoCapitalize='none'
-              />
-              <View style={styles.errorMessageContainer}>
-               <Text style={stylesFile.errorMessage}>{firstNameError}</Text>
-              </View>
+              onChangeText={(text) => setFirstName(text)}
+              placeholder={"..."}
+              autoCapitalize="none"
+            />
+            <View style={styles.errorMessageContainer}>
+              <Text style={stylesFile.errorMessage}>{firstNameError}</Text>
+            </View>
           </View>
           <View style={styles.column}>
             <Text style={stylesFile.text}>Achternaam</Text>
             <TextInput
               style={[stylesFile.input, styles.inputRight]}
               value={lastName}
-              onChangeText={(text => setLastName(text))}
-              placeholder={'...'}
-              autoCapitalize='none'
-              />
+              onChangeText={(text) => setLastName(text)}
+              placeholder={"..."}
+              autoCapitalize="none"
+            />
             <View style={styles.errorMessageContainer}>
               <Text style={stylesFile.errorMessage}>{lastNameError}</Text>
             </View>
@@ -119,34 +119,42 @@ const Register = ({navigation}) => {
         <TextInput
           style={stylesFile.input}
           value={email}
-          onChangeText={(text => setEmail(text))}
-          placeholder={'...'}
-          autoCapitalize='none'
-          />
+          onChangeText={(text) => setEmail(text)}
+          placeholder={"..."}
+          autoCapitalize="none"
+        />
         <Text style={stylesFile.errorMessage}>{emailError}</Text>
         <Text style={stylesFile.text}>Wachtwoord</Text>
         <TextInput
           style={stylesFile.input}
           value={password}
-          onChangeText={(text => setPassword(text))}
-          placeholder={'...'}
+          onChangeText={(text) => setPassword(text)}
+          placeholder={"..."}
           secureTextEntry={true}
-          />
+        />
       </View>
       <Text style={stylesFile.errorMessage}>{passwordError}</Text>
       {loading ? (
-        <ActivityIndicator size='small' color='#FA9248' />
-      ): (
+        <ActivityIndicator size="small" color="#FA9248" />
+      ) : (
         <>
           <View style={styles.buttonContainer}>
-           <CustomButton title='Registeren' buttenDesign='fullButton' onPress={signUp} />
-           <CustomButton title='Annuleren' buttenDesign='reverseButton' onPress={navigation.goBack} />
+            <CustomButton
+              title="Registeren"
+              buttonDesign="fullButton"
+              onPress={signUp}
+            />
+            <CustomButton
+              title="Annuleren"
+              buttonDesign="reverseButton"
+              onPress={navigation.goBack}
+            />
           </View>
         </>
       )}
       <StatusBar style="auto" />
     </View>
-  )
+  );
 }
 
 export default Register

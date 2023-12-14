@@ -1,29 +1,23 @@
-import { getDatabase } from '@firebase/database';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
-import { FIREBASE_APP } from './FirebaseConfig';
+import React, { useEffect, useState } from "react";
+import { View, Text } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 
-const checkNetworkConnectivity = async () => {
-    const state = await NetInfo.fetch();
-    return NetInfo.isConnected;
-}
+const Connectivity = () => {
+  const [isConnected, setIsConnected] = useState(null);
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
-const syncLocalPosts = async () => {
-    const isConnected = await checkNetworkConnectivity();
-    if (isConnected) {
-        const localPostKeys = await AsyncStorage.getAllKeys();
-        const database = getDatabase(FIREBASE_APP);
+  return (
+    <View>
+      <Text>{isConnected ? "Online" : "Offline"}</Text>
+    </View>
+  );
+};
 
-        localPostKeys.forEach(async (key) => {
-            if (key.startsWith('locaPost_')) {
-                const postData = JSON.parse(await AsyncStorage.getItem(key));
-                const postRef = ref(database, `posts/${key.slice(10)}`);
-                await set(postRef, postData);
-                await AsyncStorage.removeItem(key);
-                console.log(`Post synced successfully: ${key}`)
-            }
-        })
-    }
-}
-
-export { checkNetworkConnectivity, syncLocalPosts };
+export default Connectivity;

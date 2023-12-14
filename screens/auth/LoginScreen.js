@@ -9,13 +9,13 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { FIREBASE_AUTH } from "../FirebaseConfig.js";
+import { FIREBASE_AUTH } from "../../FirebaseConfig.js";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import stylesFile from "../styles.js";
+import stylesFile from "../../styles.js";
 
 import * as Crypto from "expo-crypto";
-import CustomButton from "../atoms/CustomButton.js";
+import CustomButton from "../../atoms/CustomButton.js";
 
 // Function to hash a password using Expo Crypto
 const hashPassword = async (password) => {
@@ -105,12 +105,12 @@ const Login = ({ navigation }) => {
           <View style={styles.buttonContainer}>
             <CustomButton
               title="Aanmelden"
-              buttenDesign="fullButton"
+              buttonDesign="fullButton"
               onPress={signIn}
             />
             <CustomButton
               title="Registreren"
-              buttenDesign="reverseButton"
+              buttonDesign="reverseButton"
               onPress={() => navigation.navigate("RegisterScreen")}
             />
           </View>

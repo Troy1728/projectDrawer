@@ -1,18 +1,15 @@
-import { StatusBar } from "expo-status-bar";
-import { IconButton } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator, HeaderTitle } from "@react-navigation/stack";
+import LoginScreen from "./screens/auth/LoginScreen.js";
+import RegisterScreen from "./screens/auth/RegisterScreen.js";
 import HomeScreen from "./screens/HomeScreen.js";
-import LoginScreen from "./screens/LoginScreen.js";
 import ListScreen from "./screens/ListScreen.js";
 import AddScreen from "./screens/AddScreen.js";
-import RegisterScreen from "./screens/RegisterScreen.js";
 import ConditionScreen from "./screens/ConditionScreen.js";
 import ProfileScreen from "./screens/ProfileScreen.js";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_AUTH } from "./FirebaseConfig.js";
-import { syncLocalPosts } from "./NetInfo.js";
 const Stack = createStackNavigator();
 const InsideStack = createStackNavigator();
 
@@ -72,7 +69,6 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    syncLocalPosts();
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
       console.log("user", user);
       setUser(user);

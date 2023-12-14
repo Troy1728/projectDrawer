@@ -7,21 +7,28 @@ import {
   Dimensions,
 } from "react-native";
 
-const CustomButton = ({ title, buttenDesign, onPress }) => {
+const CustomButton = ({ title, buttonDesign, onPress }) => {
   return (
     <View>
-      {buttenDesign == "fullButton" ? (
+      {buttonDesign == "fullButton" ? (
         <TouchableOpacity style={[styles.button]} onPress={onPress}>
           <Text style={[styles.buttonTitle]}>{title}</Text>
         </TouchableOpacity>
-      ) : buttenDesign == "halfButton" ? (
+      ) : buttonDesign == "halfButton" ? (
         <TouchableOpacity
           style={[styles.button, styles.halveButton]}
           onPress={onPress}
         >
           <Text style={[styles.buttonTitle]}>{title}</Text>
         </TouchableOpacity>
-      ) : buttenDesign == "reverseButton" ? (
+      ) : buttonDesign == "reverseButton" ? (
+        <TouchableOpacity
+          style={[styles.button, styles.reverseButton]}
+          onPress={onPress}
+        >
+          <Text style={[styles.buttonTitle]}>{title}</Text>
+        </TouchableOpacity>
+        ): buttonDesign == "logoutButton" ? (
         <TouchableOpacity
           style={[styles.button, styles.reverseButton]}
           onPress={onPress}

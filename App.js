@@ -9,7 +9,6 @@ import ConditionScreen from "./screens/ConditionScreen.js";
 import ProfileScreen from "./screens/ProfileScreen.js";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-//import { FIREBASE_AUTH } from "./FirebaseConfig.js";
 import { auth } from "./components/Firebase.jsx";
 
 const Stack = createStackNavigator();

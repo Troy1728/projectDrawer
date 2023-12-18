@@ -1,5 +1,3 @@
-// https://www.youtube.com/watch?v=q1bxyyKh3Dc
-
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
@@ -12,13 +10,18 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
 } from "react-native";
-import { ref, set } from "firebase/database";
+import { get, ref, set } from "firebase/database";
 import { db } from "../../components/Firebase.jsx";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import CustomButton from "../../atoms/CustomButton";
 import stylesFile from "../../styles.js";
 import * as Crypto from "expo-crypto";
 import { auth } from "../../components/Firebase.jsx";
+import { onAuthStateChanged } from "firebase/auth";
+
 const hashPassword = async (password) => {
   const digest = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
@@ -31,85 +34,78 @@ export default function Register({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [firstNameError, setFirstNameError] = useState("");
+
   const [lastName, setLastName] = useState("");
   const [lastNameError, setLastNameError] = useState("");
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
+
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const validateInput = (fieldName, value) => {
-    if (fieldName === "firstName") {
-      if (value === "") {
-        setFirstNameError("Voornaam is verplicht.");
-      } else {
-        setFirstNameError("");
-      }
-    } else if (fieldName === "lastName") {
-      if (value === "") {
-        setLastNameError("Achternaam is verplicht.");
-      } else {
-        setLastNameError("");
-      }
-    } else if (fieldName === "email") {
-      if (value === "") {
-        setEmailError("Email is verplicht.");
-      } else {
-        setEmailError("");
-      }
-    } else if (fieldName === "password") {
-      if (value === "") {
-        setPasswordError("Wachtwoord is verplicht.");
-      } else {
-        setPasswordError("");
-      }
-    }
-  };
-
-  const createUser = () => {
+  const createUser = async () => {
     setLoading(true);
+    setFirstNameError("");
+    setLastNameError("");
+    setEmailError("");
+    setPasswordError("");
 
-    const validatedFirstName = validateInput("firstName", firstName);
-    const validatedLastName = validateInput("lastName", lastName);
-    const validatedEmail = validateInput("email", email);
-    const validatedPassword = validateInput("password", password);
+    if (!firstName) {
+      setFirstNameError("Voornaam is verplicht");
+    }
+    else if (firstName.length < 3) {
+      setFirstNameError("Voornaam moet minstens 2 karakters bevatten");
+    }
+    if (!lastName) {
+      setLastNameError("Achternaam is verplicht");
+    }
+    else if (lastName.length < 3) {
+      setLastNameError("Achternaam moet minstens 2 karakters bevatten");
+    }
+    if (!email) {
+      setEmailError("Email is verplicht");
+    }
+    if (!password) {
+      setPasswordError("Wachtwoord is verplicht");
+    }
 
-    /*if (
-      validatedFirstName &&
-      validatedLastName &&
-      validatedEmail &&
-      validatedPassword
-    ) {
-      */
-      try {
-        const hashedPassword = hashPassword(password);
-        const userId = Date.now().toString();
-
-        set(ref(db, "users/" + userId), {
-          id: userId,
-          email: email,
-          firstname: firstName,
-          lastname: lastName,
-          password: hashedPassword,
-          location: {
-            city: "",
-            postalCode: "",
-            street: "",
-            number: "",
-          },
-        });
-        const user = createUserWithEmailAndPassword(auth, email, password);
-        console.log("User added to database.");
-      } catch (error) {
-        setLoading(false);
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    /*} else {
+    if (!firstName || !lastName || !email || !password) {
       setLoading(false);
-    }*/
+      return;
+    }
+
+    try {
+      const hashedPassword = await hashPassword(password);
+      const userCredentail = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        hashedPassword
+      );
+      const userId = userCredentail.user.uid;
+
+      set(ref(db, "users/" + userId), {
+        id: userId,
+        email: email,
+        firstname: firstName,
+        lastname: lastName,
+        password: hashedPassword,
+        location: {
+          city: "",
+          postalCode: "",
+          street: "",
+          number: "",
+        },
+      });
+    } catch (error) {
+      setLoading(false);
+      if (error.code === "auth/email-already-in-use") {
+        setEmailError("Email is al in gebruik");
+      }
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

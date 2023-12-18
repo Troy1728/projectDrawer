@@ -38,5 +38,15 @@
         "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
       }
     ]
-  ]
+  ],
+  "expo": {
+    "android": {
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+    },
+    "ios": {
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Your message here"
+      }
+    }
+  }
 }

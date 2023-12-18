@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -13,14 +13,13 @@ import {
 import { get, ref, set } from "firebase/database";
 import { db } from "../../components/Firebase.jsx";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
 } from "firebase/auth";
 import CustomButton from "../../atoms/CustomButton";
 import stylesFile from "../../styles.js";
 import * as Crypto from "expo-crypto";
 import { auth } from "../../components/Firebase.jsx";
-import { onAuthStateChanged } from "firebase/auth";
+import LocationConfig from "../../components/Location.jsx";
 
 const hashPassword = async (password) => {
   const digest = await Crypto.digestStringAsync(
@@ -43,6 +42,15 @@ export default function Register({ navigation }) {
 
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const { isLocationUpdated, latitude, longitude, city, postalCode, street, number } = LocationConfig();
+
+  useEffect(() => {
+    if (isLocationUpdated) {
+      console.log("Location updated: ", { latitude, longitude, city, postalCode, street, number });
+    }
+  }, [isLocationUpdated, latitude, longitude, city, postalCode, street, number]);
+
 
   const createUser = async () => {
     setLoading(true);
@@ -91,10 +99,10 @@ export default function Register({ navigation }) {
         lastname: lastName,
         password: hashedPassword,
         location: {
-          city: "",
-          postalCode: "",
-          street: "",
-          number: "",
+          city: city,
+          postalCode: postalCode,
+          street: street,
+          number: number,
         },
       });
     } catch (error) {

@@ -1,90 +1,121 @@
-import { View, Text, TextInput, KeyboardAvoidingView, SecureStore, TouchableOpacity, StyleSheet, Touchable, ActivityIndicator, Dimensions } from 'react-native'
-import React, {useState} from 'react'
-import { StatusBar } from 'expo-status-bar';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import stylesFile from '../../styles.js'
-import { addDoc, collection } from 'firebase/firestore';
-import * as Crypto from 'expo-crypto';
-import CustomButton from '../../atoms/CustomButton.js';
+// https://www.youtube.com/watch?v=q1bxyyKh3Dc
 
+import { StatusBar } from "expo-status-bar";
+import React, { useState } from "react";
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+} from "react-native";
+import { ref, set } from "firebase/database";
+import { db } from "../../components/Firebase.jsx";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import CustomButton from "../../atoms/CustomButton";
+import stylesFile from "../../styles.js";
+import * as Crypto from "expo-crypto";
+import { auth } from "../../components/Firebase.jsx";
 const hashPassword = async (password) => {
   const digest = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
     password
   );
   return digest;
-}
+};
 
-const Register = ({navigation}) => {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [firstNameError, setFirstNameError] = useState('')
-  const [lastNameError, setLastNameError] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const auth = FIREBASE_AUTH;
+export default function Register({ navigation }) {
+  const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [firstNameError, setFirstNameError] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [lastNameError, setLastNameError] = useState("");
 
-  const errorHandle = (email, password) => {
-    if (!email || email.length < 3) {
-      setEmailError('Email moet 3 karakters lang zijn')
-    }
-    else {
-      setEmailError('')
-    }
-    if (!password || password.length < 6) {
-      setPasswordError('Wachtwoord moet 3 karakters lang zijn')
-    }
-    else {
-      setPasswordError('')
-    }
-    if (!firstName || firstName.length < 3) {
-      setFirstNameError('Voornaam moet 3 karakters lang zijn')
-    }
-    else {
-      setFirstNameError('')
-    }
-    if (!lastName || lastName.length < 3) {
-      setLastNameError('Achternaam moet 3 karakters lang zijn')
-    }
-    else {
-      setLastNameError('')
-    }
-  }
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
-  const signUp = async () => {
-    setLoading(true)
-    errorHandle(email, password);
-    if (!emailError && !passwordError && !firstNameError && !lastNameError) {
+  const validateInput = (fieldName, value) => {
+    if (fieldName === "firstName") {
+      if (value === "") {
+        setFirstNameError("Voornaam is verplicht.");
+      } else {
+        setFirstNameError("");
+      }
+    } else if (fieldName === "lastName") {
+      if (value === "") {
+        setLastNameError("Achternaam is verplicht.");
+      } else {
+        setLastNameError("");
+      }
+    } else if (fieldName === "email") {
+      if (value === "") {
+        setEmailError("Email is verplicht.");
+      } else {
+        setEmailError("");
+      }
+    } else if (fieldName === "password") {
+      if (value === "") {
+        setPasswordError("Wachtwoord is verplicht.");
+      } else {
+        setPasswordError("");
+      }
+    }
+  };
+
+  const createUser = () => {
+    setLoading(true);
+
+    const validatedFirstName = validateInput("firstName", firstName);
+    const validatedLastName = validateInput("lastName", lastName);
+    const validatedEmail = validateInput("email", email);
+    const validatedPassword = validateInput("password", password);
+
+    /*if (
+      validatedFirstName &&
+      validatedLastName &&
+      validatedEmail &&
+      validatedPassword
+    ) {
+      */
       try {
+        const hashedPassword = hashPassword(password);
+        const userId = Date.now().toString();
 
-        const hashedPassword = await hashPassword(password);
-
-        const docRef = await addDoc(collection(FIREBASE_DB, "users"), {
-          firstName: firstName,
-          lastName: lastName,
+        set(ref(db, "users/" + userId), {
+          id: userId,
           email: email,
-          // password: hashedPassword,
+          firstname: firstName,
+          lastname: lastName,
+          password: hashedPassword,
+          location: {
+            city: "",
+            postalCode: "",
+            street: "",
+            number: "",
+          },
         });
-        console.log("Document written with ID: ", docRef.id);
-        const response = await createUserWithEmailAndPassword(auth, email, password)
-        console.log(response)
+        const user = createUserWithEmailAndPassword(auth, email, password);
+        console.log("User added to database.");
       } catch (error) {
-        console.log(error)
+        setLoading(false);
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
-      finally {
-        setLoading(false)
-      }
-    }
-  }
+    /*} else {
+      setLoading(false);
+    }*/
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={stylesFile.title}>Aanmelden</Text>
+        <Text style={stylesFile.title}>Registeren</Text>
       </View>
       <View style={styles.column}>
         <View style={styles.row}>
@@ -142,7 +173,7 @@ const Register = ({navigation}) => {
             <CustomButton
               title="Registeren"
               buttonDesign="fullButton"
-              onPress={signUp}
+              onPress={createUser}
             />
             <CustomButton
               title="Annuleren"
@@ -157,44 +188,41 @@ const Register = ({navigation}) => {
   );
 }
 
-export default Register
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   titleContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   errorMessage: {
-    color: 'red',
+    color: "red",
     marginTop: -10,
     marginBottom: 10,
     marginVertical: 0,
     marginHorizontal: 10,
   },
   buttonContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   column: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   inputLeft: {
-    width: Dimensions.get('window').width / 2.3,
+    width: Dimensions.get("window").width / 2.3,
   },
   inputRight: {
-    width: Dimensions.get('window').width / 2.3,
+    width: Dimensions.get("window").width / 2.3,
   },
   errorMessageContainer: {
-    width: Dimensions.get('window').width / 2.3,
-  }
-
+    width: Dimensions.get("window").width / 2.3,
+  },
 });

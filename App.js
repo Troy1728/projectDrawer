@@ -1,5 +1,5 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator, HeaderTitle } from "@react-navigation/stack";
+import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "./screens/auth/LoginScreen.js";
 import RegisterScreen from "./screens/auth/RegisterScreen.js";
 import HomeScreen from "./screens/HomeScreen.js";
@@ -9,7 +9,9 @@ import ConditionScreen from "./screens/ConditionScreen.js";
 import ProfileScreen from "./screens/ProfileScreen.js";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { FIREBASE_AUTH } from "./FirebaseConfig.js";
+//import { FIREBASE_AUTH } from "./FirebaseConfig.js";
+import { auth } from "./components/Firebase.jsx";
+
 const Stack = createStackNavigator();
 const InsideStack = createStackNavigator();
 
@@ -69,7 +71,7 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user) => {
+    onAuthStateChanged(auth, (user) => {
       console.log("user", user);
       setUser(user);
     });
@@ -98,6 +100,8 @@ export default function App() {
             />
           </Stack.Group>
         )}
+
+        {/* <Stack.Screen name="RegisterScreen" component={RegisterScreen} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

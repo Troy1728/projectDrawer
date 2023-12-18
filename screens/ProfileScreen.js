@@ -1,15 +1,14 @@
 import { View, Text, TextInput } from "react-native";
 import React, { useState, useEffect } from "react";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../FirebaseConfig";
+import { auth } from "../components/Firebase.jsx";
 import { signOut } from "firebase/auth";
 import CustomButton from "../atoms/CustomButton";
 //import auth from "@react-native-firebase/auth";
 //import firestore from "@react-native-firebase/firestore";
-const auth_db = FIREBASE_AUTH;
 
 const signOutUser = async () => {
   try {
-    await signOut(auth_db);
+    await signOut(auth);
     console.log("Gebruiker uitgelogd");
   } catch (error) {
     console.log(error.message);

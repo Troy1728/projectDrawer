@@ -35,6 +35,13 @@ const CustomButton = ({ title, buttonDesign, onPress }) => {
         >
           <Text style={[styles.buttonTitle]}>{title}</Text>
         </TouchableOpacity>
+        ): buttonDesign == "paginateButton" ? (
+        <TouchableOpacity
+          style={[styles.button, styles.paginateButton]}
+          onPress={onPress}
+        >
+          <Text style={[styles.buttonTitle]}>{title}</Text>
+        </TouchableOpacity>
         ) : null}
     </View>
   );
@@ -61,6 +68,14 @@ const styles = StyleSheet.create({
       borderRadius: 10,
       marginLeft:-2,
       marginBottom: -10,
+    
+  },
+  paginateButton: {
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    marginLeft: 10,
+    marginBottom: -10,
+    width: 50,
     
   },
   buttonTitle: {

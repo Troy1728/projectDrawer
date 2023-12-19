@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { FIREBASE_AUTH } from "../../FirebaseConfig.js";
-
+import { auth } from "../../components/Firebase.jsx";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import stylesFile from "../../styles.js";
 
@@ -27,47 +26,41 @@ const hashPassword = async (password) => {
 };
 
 const Login = ({ navigation }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
-  const auth = FIREBASE_AUTH;
-
-  const errorHandle = (email, password, error) => {
-    if (!email || email.length < 3) {
-      setEmailError("Email moet 3 karakters lang zijn");
-    } else {
-      setEmailError("");
-    }
-    if (!password || password.length < 6) {
-      setPasswordError("Wachtwoord moet 3 karakters lang zijn!");
-    } else {
-      setPasswordError("");
-    }
-    if (error) {
-      setEmailError("Onjuiste gegevens");
-      setPasswordError("Onjuiste gegevens");
-    } else {
-      setEmailError("");
-      setPasswordError("");
-    }
-  };
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const signIn = async () => {
     setLoading(true);
-    errorHandle(email, password);
+    setEmailError("");
+    setPasswordError("");
+
+    if (!email) {
+      setEmailError("Email is verplicht");
+    }
+    if (!password) {
+      setPasswordError("Wachtwoord is verplicht");
+    }
+
+    if (!email || !password) {
+      setLoading(false);
+      return;
+    }
     try {
       if (!emailError && !passwordError) {
+        const hashedPassword = await hashPassword(password);
         const response = await signInWithEmailAndPassword(
           auth,
           email,
-          password
+          hashedPassword
         );
-        console.log(response);
+        console.log("Sign in");
       }
     } catch (error) {
-      errorHandle(email, password, true);
+      setEmailError("Onjuiste gegevens");
+      setPasswordError("Onjuiste gegevens");
       console.log(error);
     } finally {
       setLoading(false);

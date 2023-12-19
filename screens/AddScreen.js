@@ -1,130 +1,163 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   ActivityIndicator,
   StyleSheet,
+  ScrollView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import { addDoc, collection } from "firebase/firestore";
-import { FIREBASE_DB } from "../FirebaseConfig.js";
-import stylesFile from "../styles.js";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomButton from "../atoms/CustomButton.js";
-// https://firebase.google.com/docs/firestore/manage-data/add-data
+import DropDownPicker from "react-native-dropdown-picker";
+import { StatusBar } from "expo-status-bar";
+
+const ITEMS_PER_PAGE = 2;
 
 const Add = ({ navigation }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [titleError, setTitleError] = useState("");
-  const [contentError, setContentError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fieldSets, setFieldSets] = useState([
+    { id: 1, title: "", content: "", dropdownValue: null },
+  ]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const items=[
+    { label: "appel", value: "appel" },
+    { label: "peer", value: "peer" },
+  ];
+
+  const totalPages = Math.ceil(fieldSets.length / ITEMS_PER_PAGE);
+  const visibleFieldSets = fieldSets.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   const validateInputs = () => {
-    if (!title || title.length < 5) {
-      setTitleError("Titel moet minstens 5 karakters lang zijn");
-    } else setTitleError("");
-    if (!content || content.length < 5) {
-      setContentError("Beschrijving moet minstens 5 karakters lang zijn");
-    } else setContentError("");
+    fieldSets.forEach((fieldSet) => {
+      if (!fieldSet.title || fieldSet.title.length < 3) {
+        setTitleError("Titel moet minstens 3 karakters lang zijn");
+      } else setTitleError("");
+      if (!fieldSet.content || fieldSet.content.length < 5) {
+        setContentError("Beschrijving moet minstens 5 karakters lang zijn");
+      } else setContentError("");
+    });
   };
 
-  const [item, setItem] = useState("");
+  const handleFieldChange = (setId, key, value) => {
+    setFieldSets((prevFieldSets) => {
+      const updatedFieldSets = prevFieldSets.map((fieldSet) =>
+        fieldSet.id === setId ? { ...fieldSet, [key]: value } : fieldSet
+      );
+      console.log(updatedFieldSets);
+      return updatedFieldSets;
+    });
+  };
+
+  const addFieldSet = () => {
+    setFieldSets((prevFieldSets) => [
+      ...prevFieldSets,
+      {
+        id: prevFieldSets.length + 1,
+        title: "",
+        content: "",
+        dropdownValue: null,
+      },
+    ]);
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
 
   const addItem = async () => {
-    // Retrieve existing data from local storage
-    const existingData = await AsyncStorage.getItem("items");
-    const parsedData = existingData ? JSON.parse(existingData) : [];
-
-    // Add the new item
-    const updatedData = [...parsedData, { id: Date.now(), title: item }];
-
-    // Store the updated data back to local storage
-    await AsyncStorage.setItem("items", JSON.stringify(updatedData));
-
-    // Navigate back to the ListPage
-    navigation.goBack();
-  };
-
-  /*
     setLoading(true);
     validateInputs();
+    setLoading(false);
+  };
 
-    if (!titleError && !contentError) {
-      try {
-         if (isConnected) {
-          console.log("Connected with wifi");
-          setLoading(true);
-          const docRef = await addDoc(collection(FIREBASE_DB, "posts"), {
-            title: title,
-            content: content,
-          });
-          console.log("Document written with ID: ", docRef.id);
-          navigation.navigate("ListScreen");
-        }  
-        // const localPostKeys = await AsyncStorage.getAllKeys();
-        // const newKey = `localPost_${localPostKeys.length + 1}`;
-      
-        const newPost = {
-          title,
-          content,
-          id: "localPost_temp",
-          source: "local",
-        };
-        await AsyncStorage.setItem(newKey, JSON.stringify(newPost));
-        console.log(`Post saved locally: ${newKey}`);
-        navigation.navigate("ListScreen");
-         
+  const renderFieldSets = () => {
+    return visibleFieldSets.map((fieldSet) => (
+      <View key={fieldSet.id}>
+        <Text style={styles.text}>Title</Text>
+        <TextInput
+          placeholder="Titel"
+          value={fieldSet.title}
+          onChangeText={(text) => handleFieldChange(fieldSet.id, "title", text)}
+          style={styles.input}
+        />
 
-      } catch (error) {
-        console.log("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setLoading(false);
-    }
-  }
-  */
+        <Text style={styles.text}>Content</Text>
+        <TextInput
+          placeholder="Beschrijving"
+          value={fieldSet.content}
+          onChangeText={(text) =>
+            handleFieldChange(fieldSet.id, "content", text)
+          }
+          style={styles.input}
+        />
+
+        <DropDownPicker
+          items={items}
+          open={fieldSet.open}
+          setOpen={(open) => handleFieldChange(fieldSet.id, "open", open)}
+
+          />
+      </View>
+    ));
+  };
 
   return (
-    <View style={stylesFile.container}>
-      <TextInput
-        placeholder="Title"
-        value={title}
-        onChangeText={(text) => setTitle(text)}
-        style={styles.input}
+    <View style={styles.container}>
+      {renderFieldSets()}
+
+      <CustomButton
+        title="+ Meer toevoegen +"
+        buttonDesign="fullButton"
+        onPress={addFieldSet}
       />
-      <Text style={styles.errorMessage}>{titleError}</Text>
-      <TextInput
-        placeholder="Content"
-        value={content}
-        onChangeText={(text) => setContent(text)}
-        style={styles.input}
-      />
-      <Text style={styles.errorMessage}>{contentError}</Text>
+
       {loading ? (
         <ActivityIndicator size="small" color="#FA9248" />
       ) : (
-        <CustomButton
-          title="Toevoegen"
-          buttonDesign="fullButton"
-          onPress={addItem}
-        />
+        <View>
+          <CustomButton
+            title="Toevoegen"
+            buttonDesign="fullButton"
+            onPress={addItem}
+          />
+          <CustomButton
+            title="Annuleren"
+            buttonDesign="fullButton"
+            onPress={() => {
+              navigation.navigate("ListScreen");
+            }}
+          />
+        </View>
       )}
 
+      <View style={styles.pagination}>
+        <CustomButton
+          title="<"
+          buttonDesign="paginateButton"
+          onPress={() =>
+            setCurrentPage((prevPage) => Math.max(1, prevPage - 1))
+          }
+        />
+        <Text>{`Page ${currentPage} of ${totalPages}`}</Text>
+        <CustomButton
+          title=">"
+          buttonDesign="paginateButton"
+          onPress={() =>
+            setCurrentPage((prevPage) => Math.min(totalPages, prevPage + 1))
+          }
+        />
+      </View>
       <StatusBar style="auto" />
     </View>
   );
 };
-
 export default Add;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingHorizontal: 10,
   },
   input: {
     borderWidth: 1,
@@ -134,12 +167,38 @@ const styles = StyleSheet.create({
     margin: 10,
     width: 200,
   },
-
   errorMessage: {
     color: "red",
     marginTop: -10,
     marginBottom: 10,
     marginVertical: 0,
     marginHorizontal: 10,
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 5,
+  },
+  pagination: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  dropdownContainer: {
+    height: 40,
+    width: 200,
+    margin: 10,
+  },
+  dropdownStyle: {
+    backgroundColor: "#fafafa",
+  },
+  dropdownItemStyle: {
+    justifyContent: "flex-start",
+  },
+  dropdownLabelStyle: {
+    fontSize: 16,
+    textAlign: "left",
+    color: "#000",
   },
 });

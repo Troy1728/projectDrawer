@@ -4,11 +4,9 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   Dimensions,
   ActivityIndicator,
-  KeyboardAvoidingView,
 } from "react-native";
 import { get, ref, set } from "firebase/database";
 import { db } from "../../components/Firebase.jsx";

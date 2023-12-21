@@ -7,6 +7,7 @@ import ListScreen from "./screens/ListScreen.js";
 import AddScreen from "./screens/AddScreen.js";
 import ConditionScreen from "./screens/ConditionScreen.js";
 import ProfileScreen from "./screens/ProfileScreen.js";
+import StockScreen from "./screens/StockScreen.js";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./components/Firebase.jsx";
@@ -59,6 +60,15 @@ function InsideLayout({ navigation }) {
         options={{
           header: ({ navigation }) => (
             <CustomHeader title="Voorwaarden" navigation={navigation} />
+          ),
+        }}
+      />
+      <InsideStack.Screen
+        name="StockScreen"
+        component={StockScreen}
+        options={{
+          header: ({ navigation }) => (
+            <CustomHeader title="Magazijn" navigation={navigation} />
           ),
         }}
       />

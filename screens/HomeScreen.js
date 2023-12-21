@@ -13,7 +13,7 @@ export default function HomeScreen({ navigation }) {
         <CustomButton
           title="Magazijn"
           buttonDesign="fullButton"
-          onPress={() => navigation.navigate("MagazijnScreen")}
+          onPress={() => navigation.navigate("StockScreen")}
         />
       </View>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>

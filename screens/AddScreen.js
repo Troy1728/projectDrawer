@@ -5,24 +5,20 @@ import {
   TextInput,
   ActivityIndicator,
   StyleSheet,
-  ScrollView,
 } from "react-native";
 import CustomButton from "../atoms/CustomButton.js";
-import DropDownPicker from "react-native-dropdown-picker";
 import { StatusBar } from "expo-status-bar";
+import { Picker } from "@react-native-picker/picker";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 1;
 
 const Add = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [fieldSets, setFieldSets] = useState([
-    { id: 1, title: "", content: "", dropdownValue: null },
+    { id: 1, title: "", content: "", selectedValue: "Option 1" },
   ]);
   const [currentPage, setCurrentPage] = useState(1);
-  const items=[
-    { label: "appel", value: "appel" },
-    { label: "peer", value: "peer" },
-  ];
+  const [idCounter, setIdCounter] = useState(2);
 
   const totalPages = Math.ceil(fieldSets.length / ITEMS_PER_PAGE);
   const visibleFieldSets = fieldSets.slice(
@@ -41,28 +37,39 @@ const Add = ({ navigation }) => {
     });
   };
 
-  const handleFieldChange = (setId, key, value) => {
-    setFieldSets((prevFieldSets) => {
-      const updatedFieldSets = prevFieldSets.map((fieldSet) =>
-        fieldSet.id === setId ? { ...fieldSet, [key]: value } : fieldSet
-      );
-      console.log(updatedFieldSets);
-      return updatedFieldSets;
-    });
-  };
-
   const addFieldSet = () => {
-    setFieldSets((prevFieldSets) => [
-      ...prevFieldSets,
-      {
-        id: prevFieldSets.length + 1,
-        title: "",
-        content: "",
-        dropdownValue: null,
-      },
+    setIdCounter((prevId) => prevId + 1);
+    setFieldSets([
+      ...fieldSets,
+      { id: idCounter, title: "", content: "", selectedValue: "Option 1" },
     ]);
     setCurrentPage((prevPage) => prevPage + 1);
   };
+
+  const removeFieldSet = () => {
+    setFieldSets(fieldSets.filter((item) => item.id !== currentPage));
+    setCurrentPage((prevPage) => Math.max(1, prevPage - 1));
+  };
+
+  const handleTextChange = (id, key, text) => {
+    const updatedFieldSets = fieldSets.map((fieldSet) =>
+      fieldSet.id === id ? { ...fieldSet, [key]: text } : fieldSet
+    );
+    setFieldSets(updatedFieldSets);
+  };
+
+  const handlePickerChange = (id, value) => {
+    const updatedFieldSets = fieldSets.map((item) => {
+      if (item.id === id) {
+        return { ...item, selectedValue: value };
+      }
+      return item;
+    });
+    setFieldSets(updatedFieldSets);
+  };
+
+  console.log("_________________");
+  console.log(fieldSets);
 
   const addItem = async () => {
     setLoading(true);
@@ -71,32 +78,48 @@ const Add = ({ navigation }) => {
   };
 
   const renderFieldSets = () => {
-    return visibleFieldSets.map((fieldSet) => (
-      <View key={fieldSet.id}>
+    return visibleFieldSets.map((item) => (
+      <View key={item.id}>
         <Text style={styles.text}>Title</Text>
         <TextInput
           placeholder="Titel"
-          value={fieldSet.title}
-          onChangeText={(text) => handleFieldChange(fieldSet.id, "title", text)}
+          value={item.title}
+          onChangeText={(text) => handleTextChange(item.id, "title", text)}
           style={styles.input}
         />
 
-        <Text style={styles.text}>Content</Text>
+        <Text style={styles.text}>Beschrijving</Text>
         <TextInput
           placeholder="Beschrijving"
-          value={fieldSet.content}
-          onChangeText={(text) =>
-            handleFieldChange(fieldSet.id, "content", text)
-          }
+          value={item.content}
+          onChangeText={(text) => handleTextChange(item.id, "content", text)}
           style={styles.input}
         />
-
-        <DropDownPicker
-          items={items}
-          open={fieldSet.open}
-          setOpen={(open) => handleFieldChange(fieldSet.id, "open", open)}
-
+        <Text style={styles.text}>Categorie</Text>
+        <Picker
+          style={styles.picker}
+          selectedValue={item.selectedValue}
+          onValueChange={(value) => handlePickerChange(item.id, value)}
+        >
+          <Picker.Item
+            style={styles.label}
+            key="Option1"
+            label="Option 1"
+            value="Option 1"
           />
+          <Picker.Item
+            style={styles.label}
+            key="Option2"
+            label="Option 2"
+            value="Option 2"
+          />
+          <Picker.Item
+            style={styles.label}
+            key="Option3"
+            label="Option 3"
+            value="Option 3"
+          />
+        </Picker>
       </View>
     ));
   };
@@ -110,11 +133,16 @@ const Add = ({ navigation }) => {
         buttonDesign="fullButton"
         onPress={addFieldSet}
       />
+      <CustomButton
+        title="- Artikel annuleren -"
+        buttonDesign="fullButton"
+        onPress={removeFieldSet}
+      />
 
       {loading ? (
         <ActivityIndicator size="small" color="#FA9248" />
       ) : (
-        <View>
+        <View style={{ marginBottom: 20 }}>
           <CustomButton
             title="Toevoegen"
             buttonDesign="fullButton"
@@ -122,7 +150,7 @@ const Add = ({ navigation }) => {
           />
           <CustomButton
             title="Annuleren"
-            buttonDesign="fullButton"
+            buttonDesign="reverseButton"
             onPress={() => {
               navigation.navigate("ListScreen");
             }}
@@ -154,6 +182,20 @@ const Add = ({ navigation }) => {
 export default Add;
 
 const styles = StyleSheet.create({
+  picker: {
+    height: 50,
+    width: 150,
+    backgroundColor: "white",
+    borderColor: "black",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: "black",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",

@@ -61,7 +61,7 @@ const Add = ({ navigation }) => {
     setFieldSets(updatedFieldSets);
   };
 
-  console.log(fieldSets);
+  // console.log(fieldSets);
 
   const addItem = async () => {
     setLoading(true);
@@ -104,25 +104,8 @@ const Add = ({ navigation }) => {
       setLoading(false);
       return;
     } else {
-      console.log("No errors");
       try {
-
-        const user = auth.currentUser.uid;
-        
-        const getUserData = async () => {
-          const snapshot = await get(ref(db, "users/" + user));
-          if (snapshot.exists()) {
-            console.log(snapshot.val());
-          } else {
-            console.log("No data available");
-          }
-        };
-
-        getUserData().then((userData) => {
-          console.log(userData);
-        });
-        console.log(fieldSets);
-        
+        const user = auth.currentUser.uid;        
         const setOperations = fieldSets.map(async (item) => {
           const articleId = Date.now() + item.id;
           await set(ref(db, "articles/" + articleId), {
@@ -132,7 +115,6 @@ const Add = ({ navigation }) => {
             user: user,
           });
         });
-
         await Promise.all(setOperations);
         console.log("All done");
         navigation.navigate("ListScreen");

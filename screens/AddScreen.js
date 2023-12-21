@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   ActivityIndicator,
   StyleSheet,
+  Alert,
 } from "react-native";
 import CustomButton from "../atoms/CustomButton.js";
 import { StatusBar } from "expo-status-bar";
 import { Picker } from "@react-native-picker/picker";
+import { set } from "firebase/database";
 
 const ITEMS_PER_PAGE = 1;
 
@@ -17,6 +19,7 @@ const Add = ({ navigation }) => {
   const [fieldSets, setFieldSets] = useState([
     { id: 1, title: "", content: "", selectedValue: "Option 1" },
   ]);
+  const [fieldSetErrors, setFieldSetErrors] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [idCounter, setIdCounter] = useState(2);
 
@@ -25,17 +28,6 @@ const Add = ({ navigation }) => {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
-
-  const validateInputs = () => {
-    fieldSets.forEach((fieldSet) => {
-      if (!fieldSet.title || fieldSet.title.length < 3) {
-        setTitleError("Titel moet minstens 3 karakters lang zijn");
-      } else setTitleError("");
-      if (!fieldSet.content || fieldSet.content.length < 5) {
-        setContentError("Beschrijving moet minstens 5 karakters lang zijn");
-      } else setContentError("");
-    });
-  };
 
   const addFieldSet = () => {
     setIdCounter((prevId) => prevId + 1);
@@ -68,18 +60,66 @@ const Add = ({ navigation }) => {
     setFieldSets(updatedFieldSets);
   };
 
-  console.log("_________________");
   console.log(fieldSets);
 
-  const addItem = async () => {
+  const addItem = () => {
     setLoading(true);
-    validateInputs();
-    setLoading(false);
+    let newFieldSetErrors = {};
+    fieldSets.forEach((item) => {
+      let fieldSetError = { page: item.id };
+      if (!item.title.trim()) {
+        fieldSetError = { ...fieldSetError, title: "Vul een titel in" };
+      }
+      if (!item.content.trim()) {
+        fieldSetError = {
+          ...fieldSetError,
+          content: "Vul een beschrijving in",
+        };
+      }
+      if (Object.keys(fieldSetError).length > 0) {
+        newFieldSetErrors = {
+          ...newFieldSetErrors,
+          [item.id]: { ...newFieldSetErrors[item.id], ...fieldSetError },
+        };
+      }
+    });
+    setFieldSetErrors(newFieldSetErrors);
+
+    if (Object.keys(newFieldSetErrors).length > 0) {
+      const errorMessage = Object.values(newFieldSetErrors)
+        .map(
+          (fieldSetError) =>
+            `Pagina ${fieldSetError.page}: \n ${Object.values(fieldSetError)
+              .filter((value) => typeof value === "string" && value !== "")
+              .join("\n")}`
+        )
+        .join("\n");
+      Alert.alert("Waarschuwing", errorMessage, [{ text: "OK" }]);
+      setLoading(false);
+      return;
+    }
+
+    // If no errors, proceed with your logic to add the item
+    // ...
+
+    setFieldSetErrors({});
   };
 
   const renderFieldSets = () => {
     return visibleFieldSets.map((item) => (
       <View key={item.id}>
+        <View style={styles.errorMessages}>
+          {fieldSetErrors[item.id] && (
+            <Text style={styles.errorMessage}>
+              {fieldSetErrors[item.id].title}
+            </Text>
+          )}
+          {fieldSetErrors[item.id] && (
+            <Text style={styles.errorMessage}>
+              {fieldSetErrors[item.id].content}
+            </Text>
+          )}
+        </View>
         <Text style={styles.text}>Title</Text>
         <TextInput
           placeholder="Titel"
@@ -87,7 +127,6 @@ const Add = ({ navigation }) => {
           onChangeText={(text) => handleTextChange(item.id, "title", text)}
           style={styles.input}
         />
-
         <Text style={styles.text}>Beschrijving</Text>
         <TextInput
           placeholder="Beschrijving"
@@ -242,5 +281,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "left",
     color: "#000",
+  },
+  errorMessages: {
+    width: 200,
+    margin: 10,
   },
 });

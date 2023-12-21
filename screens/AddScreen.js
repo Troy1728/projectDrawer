@@ -10,7 +10,8 @@ import {
 import CustomButton from "../atoms/CustomButton.js";
 import { StatusBar } from "expo-status-bar";
 import { Picker } from "@react-native-picker/picker";
-import { set } from "firebase/database";
+import { get, ref, set } from "firebase/database";
+import { db, auth } from "../components/Firebase.jsx";
 
 const ITEMS_PER_PAGE = 1;
 
@@ -62,7 +63,7 @@ const Add = ({ navigation }) => {
 
   console.log(fieldSets);
 
-  const addItem = () => {
+  const addItem = async () => {
     setLoading(true);
     let newFieldSetErrors = {};
     fieldSets.forEach((item) => {
@@ -83,6 +84,11 @@ const Add = ({ navigation }) => {
         };
       }
     });
+
+    newFieldSetErrors = Object.fromEntries(
+      Object.entries(newFieldSetErrors).filter(([key, value]) => value.title || value.content)
+    )
+
     setFieldSetErrors(newFieldSetErrors);
 
     if (Object.keys(newFieldSetErrors).length > 0) {
@@ -97,11 +103,46 @@ const Add = ({ navigation }) => {
       Alert.alert("Waarschuwing", errorMessage, [{ text: "OK" }]);
       setLoading(false);
       return;
+    } else {
+      console.log("No errors");
+      try {
+
+        const user = auth.currentUser.uid;
+        
+        const getUserData = async () => {
+          const snapshot = await get(ref(db, "users/" + user));
+          if (snapshot.exists()) {
+            console.log(snapshot.val());
+          } else {
+            console.log("No data available");
+          }
+        };
+
+        getUserData().then((userData) => {
+          console.log(userData);
+        });
+        console.log(fieldSets);
+        
+        const setOperations = fieldSets.map(async (item) => {
+          const articleId = Date.now() + item.id;
+          await set(ref(db, "articles/" + articleId), {
+            title: item.title,
+            content: item.content,
+            category: item.selectedValue,
+            user: user,
+          });
+        });
+
+        await Promise.all(setOperations);
+        console.log("All done");
+        navigation.navigate("ListScreen");
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
     }
-
-    // If no errors, proceed with your logic to add the item
-    // ...
-
     setFieldSetErrors({});
   };
 

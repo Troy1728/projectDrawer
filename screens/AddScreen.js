@@ -5,12 +5,14 @@ import {
   TextInput,
   ActivityIndicator,
   StyleSheet,
+  Dimensions,
   Alert,
 } from "react-native";
 import CustomButton from "../atoms/CustomButton.js";
 import { StatusBar } from "expo-status-bar";
 import { Picker } from "@react-native-picker/picker";
-import { get, ref, set } from "firebase/database";
+// import { ref, set } from "firebase/database";
+import { collection, addDoc } from "firebase/firestore";
 import { db, auth } from "../components/Firebase.jsx";
 
 const ITEMS_PER_PAGE = 1;
@@ -18,7 +20,7 @@ const ITEMS_PER_PAGE = 1;
 const Add = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [fieldSets, setFieldSets] = useState([
-    { id: 1, title: "", content: "", selectedValue: "Option 1" },
+    { id: 1, title: "", content: "", selectedValue: "Tafel" },
   ]);
   const [fieldSetErrors, setFieldSetErrors] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,7 +36,7 @@ const Add = ({ navigation }) => {
     setIdCounter((prevId) => prevId + 1);
     setFieldSets([
       ...fieldSets,
-      { id: idCounter, title: "", content: "", selectedValue: "Option 1" },
+      { id: idCounter, title: "", content: "", selectedValue: "Tafel" },
     ]);
     setCurrentPage((prevPage) => prevPage + 1);
   };
@@ -86,8 +88,10 @@ const Add = ({ navigation }) => {
     });
 
     newFieldSetErrors = Object.fromEntries(
-      Object.entries(newFieldSetErrors).filter(([key, value]) => value.title || value.content)
-    )
+      Object.entries(newFieldSetErrors).filter(
+        ([key, value]) => value.title || value.content
+      )
+    );
 
     setFieldSetErrors(newFieldSetErrors);
 
@@ -105,10 +109,9 @@ const Add = ({ navigation }) => {
       return;
     } else {
       try {
-        const user = auth.currentUser.uid;        
+        const user = auth.currentUser.uid;
         const setOperations = fieldSets.map(async (item) => {
-          const articleId = Date.now() + item.id;
-          await set(ref(db, "articles/" + articleId), {
+          await addDoc(collection(db, "articles/"), {
             title: item.title,
             content: item.content,
             category: item.selectedValue,
@@ -145,14 +148,12 @@ const Add = ({ navigation }) => {
         </View>
         <Text style={styles.text}>Title</Text>
         <TextInput
-          placeholder="Titel"
           value={item.title}
           onChangeText={(text) => handleTextChange(item.id, "title", text)}
           style={styles.input}
         />
         <Text style={styles.text}>Beschrijving</Text>
         <TextInput
-          placeholder="Beschrijving"
           value={item.content}
           onChangeText={(text) => handleTextChange(item.id, "content", text)}
           style={styles.input}
@@ -165,21 +166,27 @@ const Add = ({ navigation }) => {
         >
           <Picker.Item
             style={styles.label}
-            key="Option1"
-            label="Option 1"
-            value="Option 1"
+            key="Tafel"
+            label="Tafel"
+            value="Tafel"
           />
           <Picker.Item
             style={styles.label}
-            key="Option2"
-            label="Option 2"
-            value="Option 2"
+            key="Kast"
+            label="Kast"
+            value="Kast"
           />
           <Picker.Item
             style={styles.label}
-            key="Option3"
-            label="Option 3"
-            value="Option 3"
+            key="Zetel"
+            label="Zetel"
+            value="Zetel"
+          />
+          <Picker.Item
+            style={styles.label}
+            key="Stoel"
+            label="Stoel"
+            value="Stoel"
           />
         </Picker>
       </View>
@@ -191,13 +198,13 @@ const Add = ({ navigation }) => {
       {renderFieldSets()}
 
       <CustomButton
-        title="+ Meer toevoegen +"
-        buttonDesign="fullButton"
+        title="+ Arikel Toevoegen +"
+        buttonDesign="artikelButton"
         onPress={addFieldSet}
       />
       <CustomButton
-        title="- Artikel annuleren -"
-        buttonDesign="fullButton"
+        title="- Artikel Verwijderen -"
+        buttonDesign="artikelButton"
         onPress={removeFieldSet}
       />
 
@@ -220,7 +227,7 @@ const Add = ({ navigation }) => {
         </View>
       )}
 
-      <View style={styles.pagination}>
+      <View style={styles.paginationContainer}>
         <CustomButton
           title="<"
           buttonDesign="paginateButton"
@@ -228,7 +235,7 @@ const Add = ({ navigation }) => {
             setCurrentPage((prevPage) => Math.max(1, prevPage - 1))
           }
         />
-        <Text>{`Page ${currentPage} of ${totalPages}`}</Text>
+        <Text style={styles.paginationLabel}>{`${currentPage} of ${totalPages}`}</Text>
         <CustomButton
           title=">"
           buttonDesign="paginateButton"
@@ -243,21 +250,8 @@ const Add = ({ navigation }) => {
 };
 export default Add;
 
+const { width, height } = Dimensions.get("screen");
 const styles = StyleSheet.create({
-  picker: {
-    height: 50,
-    width: 150,
-    backgroundColor: "white",
-    borderColor: "black",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: "black",
-  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -269,8 +263,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     margin: 10,
-    width: 200,
+    width: width * 0.9,
   },
+  picker: {
+    width: width * 0.4,
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: "black",
+  },
+
   errorMessage: {
     color: "red",
     marginTop: -10,
@@ -283,11 +287,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 5,
   },
-  pagination: {
+  paginationContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     marginBottom: 20,
+  },
+  paginationLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginTop: 20,
   },
   dropdownContainer: {
     height: 40,

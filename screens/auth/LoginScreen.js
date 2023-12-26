@@ -2,8 +2,6 @@ import {
   View,
   Text,
   TextInput,
-  KeyboardAvoidingView,
-  TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
@@ -70,14 +68,14 @@ const Login = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={stylesFile.title}>Aanmelden</Text>
+        <Text style={stylesFile.title}>Donator</Text>
+        <Text style={stylesFile.subTitle}>Aanmelden</Text>
       </View>
       <Text style={stylesFile.text}>Email</Text>
       <TextInput
         style={stylesFile.input}
         value={email}
         onChangeText={(text) => setEmail(text)}
-        placeholder={"..."}
         autoCapitalize="none"
       />
       <Text style={stylesFile.errorMessage}>{emailError}</Text>
@@ -86,7 +84,6 @@ const Login = ({ navigation }) => {
         style={stylesFile.input}
         value={password}
         onChangeText={(text) => setPassword(text)}
-        placeholder={"..."}
         secureTextEntry={true}
       />
       <Text style={stylesFile.errorMessage}>{passwordError}</Text>
@@ -126,7 +123,6 @@ const styles = StyleSheet.create({
   titleContainer: {
     alignItems: "center",
   },
-
   buttonContainer: {
     alignItems: "center",
   },

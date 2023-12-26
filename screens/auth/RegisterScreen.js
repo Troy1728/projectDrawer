@@ -8,11 +8,10 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import { get, ref, set } from "firebase/database";
+// import { get, ref, set } from "firebase/database";
+import { collection, doc, setDoc } from "firebase/firestore";
 import { db } from "../../components/Firebase.jsx";
-import {
-  createUserWithEmailAndPassword
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import CustomButton from "../../atoms/CustomButton";
 import stylesFile from "../../styles.js";
 import * as Crypto from "expo-crypto";
@@ -41,14 +40,36 @@ export default function Register({ navigation }) {
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const { isLocationUpdated, latitude, longitude, city, postalCode, street, number } = LocationConfig();
+  const {
+    isLocationUpdated,
+    latitude,
+    longitude,
+    city,
+    postalCode,
+    street,
+    number,
+  } = LocationConfig();
 
   useEffect(() => {
     if (isLocationUpdated) {
-      console.log("Location updated: ", { latitude, longitude, city, postalCode, street, number });
+      console.log("Location updated: ", {
+        latitude,
+        longitude,
+        city,
+        postalCode,
+        street,
+        number,
+      });
     }
-  }, [isLocationUpdated, latitude, longitude, city, postalCode, street, number]);
-
+  }, [
+    isLocationUpdated,
+    latitude,
+    longitude,
+    city,
+    postalCode,
+    street,
+    number,
+  ]);
 
   const createUser = async () => {
     setLoading(true);
@@ -59,14 +80,12 @@ export default function Register({ navigation }) {
 
     if (!firstName) {
       setFirstNameError("Voornaam is verplicht");
-    }
-    else if (firstName.length < 3) {
+    } else if (firstName.length < 3) {
       setFirstNameError("Voornaam moet minstens 2 karakters bevatten");
     }
     if (!lastName) {
       setLastNameError("Achternaam is verplicht");
-    }
-    else if (lastName.length < 3) {
+    } else if (lastName.length < 3) {
       setLastNameError("Achternaam moet minstens 2 karakters bevatten");
     }
     if (!email) {
@@ -90,7 +109,9 @@ export default function Register({ navigation }) {
       );
       const userId = userCredentail.user.uid;
 
-      set(ref(db, "users/" + userId), {
+      const userRef = doc(db, "users", userId);
+      await setDoc(userRef, {
+        //set(ref(db, "users/" + userId), {
         id: userId,
         email: email,
         firstname: firstName,
@@ -117,43 +138,35 @@ export default function Register({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={stylesFile.title}>Registeren</Text>
+        <Text style={stylesFile.title}>Donator</Text>
+        <Text style={stylesFile.subTitle}>Registeren</Text>
       </View>
-      <View style={styles.column}>
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={stylesFile.text}>Voornaam</Text>
-            <TextInput
-              style={[stylesFile.input, styles.inputLeft]}
-              value={firstName}
-              onChangeText={(text) => setFirstName(text)}
-              placeholder={"..."}
-              autoCapitalize="none"
-            />
-            <View style={styles.errorMessageContainer}>
-              <Text style={stylesFile.errorMessage}>{firstNameError}</Text>
-            </View>
-          </View>
-          <View style={styles.column}>
-            <Text style={stylesFile.text}>Achternaam</Text>
-            <TextInput
-              style={[stylesFile.input, styles.inputRight]}
-              value={lastName}
-              onChangeText={(text) => setLastName(text)}
-              placeholder={"..."}
-              autoCapitalize="none"
-            />
-            <View style={styles.errorMessageContainer}>
-              <Text style={stylesFile.errorMessage}>{lastNameError}</Text>
-            </View>
-          </View>
+      <View>
+        <Text style={stylesFile.text}>Voornaam</Text>
+        <TextInput
+          style={stylesFile.input}
+          value={firstName}
+          onChangeText={(text) => setFirstName(text)}
+          autoCapitalize="none"
+        />
+        <View style={styles.errorMessageContainer}>
+          <Text style={stylesFile.errorMessage}>{firstNameError}</Text>
+        </View>
+        <Text style={stylesFile.text}>Achternaam</Text>
+        <TextInput
+          style={stylesFile.input}
+          value={lastName}
+          onChangeText={(text) => setLastName(text)}
+          autoCapitalize="none"
+        />
+        <View style={styles.errorMessageContainer}>
+          <Text style={stylesFile.errorMessage}>{lastNameError}</Text>
         </View>
         <Text style={stylesFile.text}>Email</Text>
         <TextInput
           style={stylesFile.input}
           value={email}
           onChangeText={(text) => setEmail(text)}
-          placeholder={"..."}
           autoCapitalize="none"
         />
         <Text style={stylesFile.errorMessage}>{emailError}</Text>
@@ -162,7 +175,6 @@ export default function Register({ navigation }) {
           style={stylesFile.input}
           value={password}
           onChangeText={(text) => setPassword(text)}
-          placeholder={"..."}
           secureTextEntry={true}
         />
       </View>
@@ -209,20 +221,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: "center",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  column: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  inputLeft: {
-    width: Dimensions.get("window").width / 2.3,
-  },
-  inputRight: {
-    width: Dimensions.get("window").width / 2.3,
   },
   errorMessageContainer: {
     width: Dimensions.get("window").width / 2.3,

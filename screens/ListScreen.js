@@ -1,66 +1,65 @@
-/*import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { FlatList } from "react-native-gesture-handler";
-import { FIREBASE_DB } from "../FirebaseConfig.js";
-import { collection, getDocs } from "firebase/firestore";
-import stylesFile from "../styles.js";
+import { Picker } from "@react-native-picker/picker";
+import { db } from "../components/Firebase";
+// import { get, ref } from "firebase/database";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import CustomButton from "../atoms/CustomButton.js";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-const List = ({ navigation }) => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  const getPostsFromFirestore = async () => {
+const List = ({ navigation }) => {
+  const [loading, setLoading] = useState(false);
+  const [articles, setData] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
+
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const postsCol = collection(FIREBASE_DB, "posts");
-      const postsSnapshot = await getDocs(postsCol);
-      const postsData = [];
-      postsSnapshot.forEach((doc) => {
-        postsData.push({ ...doc.data(), id: doc.id, source: "firestore" });
-      });
-      setPosts((prevPosts) => [...prevPosts, ...postsData]);
-    } catch (error) {
-      console.error("Error accord " . error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchLocalPosts = async () => {
-    try {
-      // get all keys from local storage
-      const localPostsKeys = await AsyncStorage.getAllKeys();
-      const localPostsJson = await AsyncStorage.multiGet(localPostsKeys);
-      
-      const filterLocalPosts = localPostsJson.map((post) => ({
-        ...JSON.parse(post[1]),
-        source: "local",
-      }));
-      
-      // filter out posts with duplicate ids
-      const uniqueLocalPosts = filterLocalPosts.filter(
-        (post, index, self) =>
-          index === self.findIndex((p) => p.id === post.id) === index
-      );
-      // set local posts to state
-      setPosts((prevPosts) => [...prevPosts, ...uniqueLocalPosts]);
+      const q = query(collection(db, "articles"));
+      if (selectedType) {
+        const filterQ = query(collection(db, "articles"), where('category', "==", selectedType));
+        const snapshot = await getDocs(filterQ);
+        setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      } else {
+        const snapshot = await getDocs(q);
+        setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      }
     } catch (error) {
       console.error(error);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
+  const handleFilter = (itemValue) => {
+    setSelectedType(itemValue);
+  };
+
+  const filteredArticles = selectedType
+    ? articles.filter((article) => article.category === selectedType)
+    : articles;
 
   useEffect(() => {
-    getPostsFromFirestore();
-    fetchLocalPosts();
+    fetchData();
   }, []);
 
+  // update data when user navigates back to list
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchData();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   return (
-    <View style={stylesFile.container}>
+    <View style={styles.container}>
       {loading ? (
         <ActivityIndicator size="small" color="#FA9248" />
       ) : (
@@ -70,16 +69,30 @@ const List = ({ navigation }) => {
           onPress={() => navigation.navigate("AddScreen")}
         />
       )}
+      <View style={styles.filterContainer}>
+        <Picker
+          selectedValue={selectedType}
+          onValueChange={(itemValue) => handleFilter(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item style={styles.label} label="All" value={null} />
+          <Picker.Item style={styles.label} label="Tafel" value="Tafel" />
+          <Picker.Item style={styles.label} label="Kast" value="Kast" />
+          <Picker.Item style={styles.label} label="Zetel" value="Zetel" />
+          <Picker.Item style={styles.label} label="Stoel" value="Stoel" />
+        </Picker>
+      </View>
 
       <FlatList
         style={styles.posts}
-        data={posts}
+        data={filteredArticles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.postContainer}>
-            <Text style={stylesFile.item}>{item.title}</Text>
-            <Text style={stylesFile.item}>{item.content}</Text>
-            <Text style={stylesFile.item}>Source: {item.source}</Text>
+            <Text style={styles.item}>{item.title}</Text>
+            <Text style={styles.item}>{item.content}</Text>
+            <Text style={styles.item}>Source: {item.source}</Text>
+            <Text style={styles.item}>Categorie: {item.category}</Text>
             <CustomButton
               title="Edit"
               buttonDesign="reverseButton"
@@ -96,6 +109,15 @@ const List = ({ navigation }) => {
 export default List;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 10,
+  },
+  articleList: {
+    marginTop: 20,
+    backgroundColor: "red",
+  },
   postContainer: {
     borderWidth: 2,
     borderColor: "#000",
@@ -108,45 +130,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
     height: 44,
   },
-});*/
-
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList, ListItem } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const List = ({ navigation }) => {
-  const [data, setData] = useState([]);
-  const fetchData = async () => {
-    // Retrieve data from local storage
-    const storedData = await AsyncStorage.getItem("items");
-    const parsedData = storedData ? JSON.parse(storedData) : [];
-
-    // Update the state with the retrieved data
-    setData(parsedData);
-  };
-
-  useEffect(() => {
-    // Fetch data when the component mounts
-    fetchData();
-  }, []);
-
-  return (
-    <View>
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <ListItem
-            title={item.title}
-            onPress={() => console.log("Item pressed:", item)}
-          />
-        )}
-      />
-      <Text onPress={() => navigation.navigate("AddScreen")}>Add Item</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-};
-
-export default List;
+});

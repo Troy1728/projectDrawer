@@ -50,7 +50,7 @@ function InsideLayout({ navigation }) {
         component={ProfileScreen}
         options={{
           header: ({ navigation }) => (
-            <CustomHeader title="Profiel" navigation={navigation} />
+             <CustomHeader title="Profiel" navigation={navigation} />
           ),
         }}
       />

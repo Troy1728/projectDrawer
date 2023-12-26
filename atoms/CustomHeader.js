@@ -2,11 +2,17 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { IconButton } from "react-native-paper";
+import { Ionicons } from "@expo/vector-icons";
 
 const CustomHeader = ({ title, navigation }) => {
   return (
     <View style={styles.headerContainer}>
       <Text style={styles.header}>{title}</Text>
+      {title === "Profiel" ? (
+        <View style={styles.iconHeader}>
+          <Ionicons name="person" size={30} color="#FA9248" />
+        </View>
+      ) : null}
       <IconButton
         icon="arrow-left-circle"
         backgroundColor="#FA9248"
@@ -34,5 +40,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginTop: 30,
     marginBottom: 10,
+  },
+  iconHeader: {
+    marginHorizontal: 10,
+    borderColor: "#FA9248",
+    borderWidth: 3,
+    borderRadius: 25,
+    padding: 3,
   },
 });

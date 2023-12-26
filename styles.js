@@ -1,31 +1,41 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const styles = StyleSheet.create({
-container: {
+  container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 10,
   },
-  text : {
+  text: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-  title : {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#FA9248',
-  },  
+  title: {
+    fontFamily: "Roboto",
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#FA9248",
+    textShadowColor: "black",
+    textShadowOffset: { width: -1, height: 2 },
+    textShadowRadius: 2,
+  },
+  subTitle: {
+    fontFamily: "Roboto",
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FA9248",
+  },
   buttonTitle: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   button: {
-    width: Dimensions.get('window').width / 2,
-    alignItems: 'center',
+    width: Dimensions.get("window").width / 2,
+    alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 10,
-    borderColor: 'black',
-    backgroundColor: '#FA9248',
+    borderColor: "black",
+    backgroundColor: "#FA9248",
     borderWidth: 2,
     borderRadius: 5,
     marginVertical: 10,
@@ -39,7 +49,7 @@ container: {
     paddingHorizontal: 10,
   },
   errorMessage: {
-    color: 'red',
+    color: "red",
     marginTop: -10,
     marginBottom: 10,
     marginVertical: 0,

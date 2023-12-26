@@ -30,6 +30,11 @@ export default function HomeScreen({ navigation }) {
       </View>
       <View style={{ justifyContent: "space-evenly" }}>
         <CustomButton
+          title="Donatie Maken"
+          buttonDesign="fullButton"
+          onPress={() => navigation.navigate("AddScreen")}
+        />
+        <CustomButton
           title="Alle Donaties"
           buttonDesign="fullButton"
           onPress={() => navigation.navigate("ListScreen")}

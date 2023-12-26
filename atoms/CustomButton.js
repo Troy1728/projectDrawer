@@ -8,43 +8,22 @@ import {
 } from "react-native";
 
 const CustomButton = ({ title, buttonDesign, onPress }) => {
-  return (
-    <View>
-      {buttonDesign == "fullButton" ? (
-        <TouchableOpacity style={[styles.button]} onPress={onPress}>
-          <Text style={[styles.buttonTitle]}>{title}</Text>
-        </TouchableOpacity>
-      ) : buttonDesign == "halfButton" ? (
-        <TouchableOpacity
-          style={[styles.button, styles.halveButton]}
-          onPress={onPress}
-        >
-          <Text style={[styles.buttonTitle]}>{title}</Text>
-        </TouchableOpacity>
-      ) : buttonDesign == "reverseButton" ? (
-        <TouchableOpacity
-          style={[styles.button, styles.reverseButton]}
-          onPress={onPress}
-        >
-          <Text style={[styles.buttonTitle]}>{title}</Text>
-        </TouchableOpacity>
-        ): buttonDesign == "logoutButton" ? (
-        <TouchableOpacity
-          style={[styles.button, styles.reverseButton]}
-          onPress={onPress}
-        >
-          <Text style={[styles.buttonTitle]}>{title}</Text>
-        </TouchableOpacity>
-        ): buttonDesign == "paginateButton" ? (
-        <TouchableOpacity
-          style={[styles.button, styles.paginateButton]}
-          onPress={onPress}
-        >
-          <Text style={[styles.buttonTitle]}>{title}</Text>
-        </TouchableOpacity>
-        ) : null}
-    </View>
-  );
+  const buttonStyles = {
+    fullButton: {},
+    halfButton: styles.halveButton,
+    reverseButton: styles.reverseButton,
+    logoutButton: styles.reverseButton,
+    paginateButton: styles.paginateButton,
+    artikelButton: styles.artikelButton,
+  };
+  
+  const style = [styles.button, buttonStyles[buttonDesign]];
+
+  return buttonDesign ? (
+    <TouchableOpacity style={style} onPress={onPress}>
+      <Text style={[styles.buttonTitle]}>{title}</Text>
+    </TouchableOpacity>
+  ): null;  
 };
 export default CustomButton;
 
@@ -64,11 +43,10 @@ const styles = StyleSheet.create({
     width: Dimensions.get("screen").width / 2 - 20,
   },
   reverseButton: {
-      backgroundColor: "#FFF",
-      borderRadius: 10,
-      marginLeft:-2,
-      marginBottom: -10,
-    
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    marginLeft: -2,
+    marginBottom: -10,
   },
   paginateButton: {
     backgroundColor: "#FFF",
@@ -76,7 +54,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginBottom: -10,
     width: 50,
-    
+  },
+  artikelButton: {
+    backgroundColor: "rgba(250,146,72,0.5)",
+    borderStyle: "dashed",
   },
   buttonTitle: {
     fontSize: 15,

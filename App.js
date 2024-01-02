@@ -4,13 +4,14 @@ import LoginScreen from "./screens/auth/LoginScreen.js";
 import RegisterScreen from "./screens/auth/RegisterScreen.js";
 import HomeScreen from "./screens/HomeScreen.js";
 import ListScreen from "./screens/ListScreen.js";
+import EditScreen from "./screens/EditScreen.js";
 import AddScreen from "./screens/AddScreen.js";
 import ConditionScreen from "./screens/ConditionScreen.js";
 import ProfileScreen from "./screens/ProfileScreen.js";
 import StockScreen from "./screens/StockScreen.js";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./components/Firebase.jsx";
+import { FIREBASE_AUTH } from "./components/Firebase.jsx";
 
 const Stack = createStackNavigator();
 const InsideStack = createStackNavigator();
@@ -46,6 +47,15 @@ function InsideLayout({ navigation }) {
         }}
         />
       <InsideStack.Screen
+        name="EditScreen"
+        component={EditScreen}
+        options={{
+          header: ({ navigation }) => (
+            <CustomHeader title="Donatie Bewerken" navigation={navigation} />
+          ),
+        }}
+      />
+      <InsideStack.Screen
         name="ProfileScreen"
         component={ProfileScreen}
         options={{
@@ -80,7 +90,7 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(FIREBASE_AUTH, (user) => {
       console.log("user", user);
       setUser(user);
     });

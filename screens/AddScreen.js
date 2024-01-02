@@ -7,20 +7,25 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  ImageBackground,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import Icon from "react-native-vector-icons/FontAwesome"; // You can choose the icon library you prefer
 import CustomButton from "../atoms/CustomButton.js";
 import { StatusBar } from "expo-status-bar";
 import { Picker } from "@react-native-picker/picker";
-// import { ref, set } from "firebase/database";
 import { collection, addDoc } from "firebase/firestore";
-import { db, auth } from "../components/Firebase.jsx";
+import { db, FIREBASE_AUTH } from "../components/Firebase.jsx";
 
 const ITEMS_PER_PAGE = 1;
 
 const Add = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [fieldSets, setFieldSets] = useState([
-    { id: 1, title: "", content: "", selectedValue: "Tafel" },
+    { id: 1, title: "", content: "", selectedValue: "Tafel", image: "" },
   ]);
   const [fieldSetErrors, setFieldSetErrors] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +68,46 @@ const Add = ({ navigation }) => {
     setFieldSets(updatedFieldSets);
   };
 
-  // console.log(fieldSets);
+   console.log(fieldSets);
+
+  const openCamera = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync();
+    if (!result.canceled) {
+      const imageUri =
+        result.assets && result.assets.length > 0 ? result.assets[0].uri : null;
+      //setInputImage(imageUri);
+      setFieldSets((prevFieldSets) =>
+        prevFieldSets.map((item) =>
+          item.id === currentPage ? { ...item, image: imageUri } : item
+        )
+      );
+    }
+  };
+
+  const openImagePicker = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Permission to access library roll is required!");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync();
+    if (!result.canceled) {
+      const imageUri =
+        result.assets && result.assets.length > 0 ? result.assets[0].uri : null;
+      //setInputImage(imageUri);
+      setFieldSets((prevFieldSets) =>
+        prevFieldSets.map((item) =>
+          item.id === currentPage ? { ...item, image: imageUri } : item
+        )
+      );
+    }
+  };
 
   const addItem = async () => {
     setLoading(true);
@@ -109,15 +153,18 @@ const Add = ({ navigation }) => {
       return;
     } else {
       try {
-        const user = auth.currentUser.uid;
+        const user = FIREBASE_AUTH.currentUser.uid;
         const setOperations = fieldSets.map(async (item) => {
           await addDoc(collection(db, "articles/"), {
             title: item.title,
             content: item.content,
             category: item.selectedValue,
+            image: item.image,
+            status: "in behandeling",
             user: user,
           });
         });
+    
         await Promise.all(setOperations);
         console.log("All done");
         navigation.navigate("ListScreen");
@@ -189,11 +236,27 @@ const Add = ({ navigation }) => {
             value="Stoel"
           />
         </Picker>
+        <View style={styles.imageContainer}>
+          <Text style={styles.text}>Foto</Text>
+          <ImageBackground
+            source={item.image ? { uri: item.image } : null}
+            style={styles.configImage}
+          >
+            <TouchableOpacity onPress={openCamera}>
+              <Icon name="camera" style={styles.icon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={openImagePicker}>
+              <Icon name="image" style={styles.icon} />
+            </TouchableOpacity>
+          </ImageBackground>
+        </View>
       </View>
     ));
   };
 
   return (
+    <ScrollView>
     <View style={styles.container}>
       {renderFieldSets()}
 
@@ -235,7 +298,9 @@ const Add = ({ navigation }) => {
             setCurrentPage((prevPage) => Math.max(1, prevPage - 1))
           }
         />
-        <Text style={styles.paginationLabel}>{`${currentPage} of ${totalPages}`}</Text>
+        <Text
+          style={styles.paginationLabel}
+        >{`${currentPage} of ${totalPages}`}</Text>
         <CustomButton
           title=">"
           buttonDesign="paginateButton"
@@ -246,6 +311,7 @@ const Add = ({ navigation }) => {
       </View>
       <StatusBar style="auto" />
     </View>
+    </ScrollView>
   );
 };
 export default Add;
@@ -274,7 +340,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "black",
   },
-
   errorMessage: {
     color: "red",
     marginTop: -10,
@@ -317,5 +382,26 @@ const styles = StyleSheet.create({
   errorMessages: {
     width: 200,
     margin: 10,
+  },
+  imageContainer: {
+    flexDirection: "column",
+    justifyContent: "space-around",
+  },
+  configImage: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    width: width * 0.9,
+    height: height * 0.15,
+    marginLeft: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#FA9248",
+  },
+  icon: {
+    backgroundColor: "#fff",
+    fontSize: 20,
+    padding: 10,
+    borderRadius: 50,
   },
 });

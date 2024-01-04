@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  Image,
   FlatList,
   StyleSheet,
   Dimensions,
@@ -10,9 +11,10 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { Picker } from "@react-native-picker/picker";
 import { db } from "../components/Firebase";
-// import { get, ref } from "firebase/database";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import CustomButton from "../atoms/CustomButton.js";
+import { ref, getDownloadURL, listAll, getStorage } from "firebase/storage";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry.js";
 
 const List = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
@@ -24,12 +26,42 @@ const List = ({ navigation }) => {
     try {
       const q = query(collection(db, "articles"));
       if (selectedType) {
-        const filterQ = query(collection(db, "articles"), where('category', "==", selectedType));
+        const filterQ = query(
+          collection(db, "articles"),
+          where("category", "==", selectedType)
+        );
         const snapshot = await getDocs(filterQ);
-        setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        const articlesData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setData(articlesData);
+
+        if (articlesData.length > 0) {
+          const storage = getStorage();
+          for (let i = 0; i < articlesData.length; i++) {
+            const listRef = ref(storage, "images/" + articlesData[i].image);
+            const url = await getDownloadURL(listRef);
+            articlesData[i].image_download_url = url;
+          }
+          setData([...articlesData]);
+        }
       } else {
         const snapshot = await getDocs(q);
-        setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        const articlesData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setData(articlesData);
+        if (articlesData.length > 0) {
+          const storage = getStorage();
+          for (let i = 0; i < articlesData.length; i++) {
+            const listRef = ref(storage, "images/" + articlesData[i].image);
+            const url = await getDownloadURL(listRef);
+            articlesData[i].image_download_url = url;
+          }
+          setData([...articlesData]);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -50,7 +82,6 @@ const List = ({ navigation }) => {
     fetchData();
   }, []);
 
-  // update data when user navigates back to list
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       fetchData();
@@ -89,12 +120,37 @@ const List = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.postContainer}>
-            <Text style={styles.item}>{item.title}</Text>
-            <Text style={styles.item}>{item.content}</Text>
-            <Text style={styles.item}>Source: {item.source}</Text>
-            <Text style={styles.item}>Categorie: {item.category}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: 20,
+                paddingVertical: 10,
+              }}
+            >
+              <View style={{ flexDirection: "column" }}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.content}>
+                  {item.content.length > 20
+                    ? item.content.substring(0, 20) + "..."
+                    : item.content}
+                </Text>
+                <Text style={styles.content}>Categorie: {item.category}</Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Image
+                  style={{
+                    width: 130,
+                    height: 130,
+                    paddingVertical: 5,
+                    borderRadius: 10,
+                  }}
+                  source={{ uri: item.image_download_url }}
+                />
+              </View>
+            </View>
             <CustomButton
-              title="Edit"
+              title="Bijwerken"
               buttonDesign="reverseButton"
               onPress={() => navigation.navigate("EditScreen", { item })}
             />
@@ -125,9 +181,19 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     backgroundColor: "rgba(250,146,72,0.7)",
   },
-  item: {
+  title: {
     padding: 10,
     fontSize: 18,
     height: 44,
+  },
+  content: {
+    padding: 10,
+    fontSize: 14,
+    height: 44,
+  },
+  image: {
+    width: "50%",
+    height: 200,
+    marginBottom: 20,
   },
 });

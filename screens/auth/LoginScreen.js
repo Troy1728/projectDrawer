@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { auth } from "../../components/Firebase.jsx";
+import { FIREBASE_AUTH } from "../../components/Firebase.jsx";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import stylesFile from "../../styles.js";
 
@@ -50,7 +50,7 @@ const Login = ({ navigation }) => {
       if (!emailError && !passwordError) {
         const hashedPassword = await hashPassword(password);
         const response = await signInWithEmailAndPassword(
-          auth,
+          FIREBASE_AUTH,
           email,
           hashedPassword
         );

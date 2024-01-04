@@ -18,7 +18,11 @@ import CustomButton from "../atoms/CustomButton.js";
 import { StatusBar } from "expo-status-bar";
 import { Picker } from "@react-native-picker/picker";
 import { collection, addDoc } from "firebase/firestore";
-import { db, FIREBASE_AUTH } from "../components/Firebase.jsx";
+import {
+  db,
+  FIREBASE_AUTH,
+} from "../components/Firebase.jsx";
+import { ref, uploadBytesResumable, getStorage } from "firebase/storage";
 
 const ITEMS_PER_PAGE = 1;
 
@@ -68,7 +72,7 @@ const Add = ({ navigation }) => {
     setFieldSets(updatedFieldSets);
   };
 
-   console.log(fieldSets);
+  // console.log(fieldSets);
 
   const openCamera = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -159,12 +163,37 @@ const Add = ({ navigation }) => {
             title: item.title,
             content: item.content,
             category: item.selectedValue,
-            image: item.image,
+            image: item.image.split("/").pop(),
             status: "in behandeling",
             user: user,
           });
+
+          if (item.image) {
+            const response = await fetch(item.image);
+            const blob = await response.blob();
+            const imageName = item.image.split("/").pop();
+            const storage = getStorage();
+            const storageRef = ref(storage, `images/${imageName}`);
+            const uploadTask = uploadBytesResumable(storageRef, blob);
+
+            uploadTask.on(
+              "state_changed",
+              (snapshot) => {
+                const progress = Math.round(
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+                console.log(
+                  "🚀 ~ file: StockScreen.js:36 ~ uploadImage ~ progress",
+                  progress
+                );
+              },
+              (error) => {
+                console.error(error);
+              }
+            );  
+          }
         });
-    
+
         await Promise.all(setOperations);
         console.log("All done");
         navigation.navigate("ListScreen");
@@ -257,60 +286,60 @@ const Add = ({ navigation }) => {
 
   return (
     <ScrollView>
-    <View style={styles.container}>
-      {renderFieldSets()}
+      <View style={styles.container}>
+        {renderFieldSets()}
 
-      <CustomButton
-        title="+ Arikel Toevoegen +"
-        buttonDesign="artikelButton"
-        onPress={addFieldSet}
-      />
-      <CustomButton
-        title="- Artikel Verwijderen -"
-        buttonDesign="artikelButton"
-        onPress={removeFieldSet}
-      />
+        <CustomButton
+          title="+ Arikel Toevoegen +"
+          buttonDesign="artikelButton"
+          onPress={addFieldSet}
+        />
+        <CustomButton
+          title="- Artikel Verwijderen -"
+          buttonDesign="artikelButton"
+          onPress={removeFieldSet}
+        />
 
-      {loading ? (
-        <ActivityIndicator size="small" color="#FA9248" />
-      ) : (
-        <View style={{ marginBottom: 20 }}>
+        {loading ? (
+          <ActivityIndicator size="small" color="#FA9248" />
+        ) : (
+          <View style={{ marginBottom: 20 }}>
+            <CustomButton
+              title="Toevoegen"
+              buttonDesign="fullButton"
+              onPress={addItem}
+            />
+            <CustomButton
+              title="Annuleren"
+              buttonDesign="reverseButton"
+              onPress={() => {
+                navigation.navigate("ListScreen");
+              }}
+            />
+          </View>
+        )}
+
+        <View style={styles.paginationContainer}>
           <CustomButton
-            title="Toevoegen"
-            buttonDesign="fullButton"
-            onPress={addItem}
+            title="<"
+            buttonDesign="paginateButton"
+            onPress={() =>
+              setCurrentPage((prevPage) => Math.max(1, prevPage - 1))
+            }
           />
+          <Text
+            style={styles.paginationLabel}
+          >{`${currentPage} of ${totalPages}`}</Text>
           <CustomButton
-            title="Annuleren"
-            buttonDesign="reverseButton"
-            onPress={() => {
-              navigation.navigate("ListScreen");
-            }}
+            title=">"
+            buttonDesign="paginateButton"
+            onPress={() =>
+              setCurrentPage((prevPage) => Math.min(totalPages, prevPage + 1))
+            }
           />
         </View>
-      )}
-
-      <View style={styles.paginationContainer}>
-        <CustomButton
-          title="<"
-          buttonDesign="paginateButton"
-          onPress={() =>
-            setCurrentPage((prevPage) => Math.max(1, prevPage - 1))
-          }
-        />
-        <Text
-          style={styles.paginationLabel}
-        >{`${currentPage} of ${totalPages}`}</Text>
-        <CustomButton
-          title=">"
-          buttonDesign="paginateButton"
-          onPress={() =>
-            setCurrentPage((prevPage) => Math.min(totalPages, prevPage + 1))
-          }
-        />
+        <StatusBar style="auto" />
       </View>
-      <StatusBar style="auto" />
-    </View>
     </ScrollView>
   );
 };

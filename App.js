@@ -33,7 +33,7 @@ function InsideLayout({ navigation }) {
         component={ListScreen}
         options={{
           header: ({ navigation }) => (
-            <CustomHeader title="Alle Donaties" navigation={navigation} />
+            <CustomHeader title="DONATIES" navigation={navigation} />
           ),
         }}
       />
@@ -42,7 +42,7 @@ function InsideLayout({ navigation }) {
         component={AddScreen}
         options={{
           header: ({ navigation }) => (
-            <CustomHeader title="Donatie Aanmaken" navigation={navigation} />
+            <CustomHeader title="AANMAKEN" navigation={navigation} />
           ),
         }}
         />
@@ -51,7 +51,7 @@ function InsideLayout({ navigation }) {
         component={EditScreen}
         options={{
           header: ({ navigation }) => (
-            <CustomHeader title="Donatie Bewerken" navigation={navigation} />
+            <CustomHeader title="BIJWERKEN" navigation={navigation} />
           ),
         }}
       />
@@ -60,7 +60,7 @@ function InsideLayout({ navigation }) {
         component={ProfileScreen}
         options={{
           header: ({ navigation }) => (
-             <CustomHeader title="Profiel" navigation={navigation} />
+             <CustomHeader title="PROFIEL" navigation={navigation} />
           ),
         }}
       />
@@ -69,7 +69,7 @@ function InsideLayout({ navigation }) {
         component={ConditionScreen}
         options={{
           header: ({ navigation }) => (
-            <CustomHeader title="Voorwaarden" navigation={navigation} />
+            <CustomHeader title="VOORWAARDEN" navigation={navigation} />
           ),
         }}
       />
@@ -78,7 +78,7 @@ function InsideLayout({ navigation }) {
         component={StockScreen}
         options={{
           header: ({ navigation }) => (
-            <CustomHeader title="Magazijn" navigation={navigation} />
+            <CustomHeader title="MAGAZIJN" navigation={navigation} />
           ),
         }}
       />

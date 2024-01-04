@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  Image,
   Dimensions,
   StyleSheet,
   ImageBackground,
@@ -13,11 +12,14 @@ import { Picker } from "@react-native-picker/picker";
 import Icon from "react-native-vector-icons/FontAwesome";
 import CustomButton from "../atoms/CustomButton";
 import * as ImagePicker from "expo-image-picker";
-import { setDoc, collection, doc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { db } from "../components/Firebase.jsx";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
 const EditScreen = ({ navigation, route }) => {
   const [fieldSet, setFieldSet] = useState(route.params.item);
+
+  console.log(fieldSet);
 
   const handleTextChange = (id, name, text) => {
     setFieldSet((prevFieldSet) => {
@@ -28,11 +30,8 @@ const EditScreen = ({ navigation, route }) => {
   const handlePickerChange = (id, value) => {
     setFieldSet((prevFieldSet) => {
       return { ...prevFieldSet, selectedValue: value };
-    });
+     });
   };
-
-
-  console.log(fieldSet);
 
   const openCamera = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -41,17 +40,9 @@ const EditScreen = ({ navigation, route }) => {
       return;
     }
     const result = await ImagePicker.launchCameraAsync();
-    if (!result.canceled) {
-      const imageUri =
-        result.assets && result.assets.length > 0 ? result.assets[0].uri : null;
-      //setInputImage(imageUri);
-      setFieldSets((prevFieldSets) =>
-        prevFieldSets.map((item) =>
-          item.id === currentPage ? { ...item, image: imageUri } : item
-        )
-      );
-    }
-  };
+    handleImage(result);
+  }
+
   const openImagePicker = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -60,22 +51,90 @@ const EditScreen = ({ navigation, route }) => {
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync();
+    handleImage(result);
+  };
+
+  const handleImage = async (result) => {
     if (!result.canceled) {
       const imageUri =
         result.assets && result.assets.length > 0 ? result.assets[0].uri : null;
-      //setInputImage(imageUri);
-      setFieldSets((prevFieldSets) =>
-        prevFieldSets.map((item) =>
-          item.id === currentPage ? { ...item, image: imageUri } : item
-        )
-      );
+
+      const storage = getStorage();
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      const oldImageRef = ref(storage, "images/" + fieldSet.image);
+      const newImageRef = ref(storage, "images/" + imageUri.split("/").pop());
+      await deleteObject(oldImageRef);
+      await uploadBytes(newImageRef, blob);
+      const url = await getDownloadURL(newImageRef);
+      setFieldSet((prevFieldSet) => {
+        return {
+          ...prevFieldSet,
+          image_download_url: url,
+          image: imageUri.split("/").pop(),
+        };
+      });
     }
   };
 
+  const [errorTitle, setErrorTitle] = useState("");
+  const [errorContent, setErrorContent] = useState("");
+  const [errorCategory, setErrorCategory] = useState("");
+  const [errorImage, setErrorImage] = useState("");
+
+  const validation = () => {
+    const avalibleCatergies = ["Tafel", "Kast", "Zetel", "Stoel"];
+    switch (true) {
+      case !fieldSet.title:
+        setErrorTitle("Titel is gevraagd");
+        break;
+      case fieldSet.title.length < 3:
+        setErrorTitle("Titel moet minstens 3 karakters bevatten");
+        break;
+      default:
+        setErrorTitle("");
+        break;
+    }
+
+    switch (true) {
+      case !fieldSet.content:
+        setErrorContent("Beschrijving is gevraagd");
+        break;
+      case fieldSet.content.length < 3:
+        setErrorContent("Beschrijving moet minstens 10 karakters bevatten");
+        break;
+      default:
+        setErrorContent("");
+        break;
+    }
+
+    switch (true) {
+      case !avalibleCatergies.includes(fieldSet.category):
+        setErrorCategory("Categorie is niet geldig");
+        break;
+      default:
+        setErrorCategory("");
+        break;
+    }
+
+    switch (true) {
+      case !fieldSet.image:
+        setErrorImage("Foto is gevraagd");
+        break;
+      default:
+        setErrorImage("");
+        break;
+    }
+    return true;
+  };
+
   const handleSave = async () => {
+    validation();
     try {
-      const { title, content, category, image } = fieldSet;
-      if (title && content  && image) {
+      if (validation() !== true) {
+        return;
+      } else {
+        const { title, content, category, image } = fieldSet;
         const updatedItem = {
           id: fieldSet.id,
           title,
@@ -83,16 +142,9 @@ const EditScreen = ({ navigation, route }) => {
           category,
           image,
         };
-
-
-        await setDoc(
-          doc(db, "articles", fieldSet.id),
-          updatedItem
-        );
+        await setDoc(doc(db, "articles", fieldSet.id), updatedItem);
 
         navigation.navigate("ListScreen", { updatedItem });
-      } else {
-        alert("Please fill all the fields");
       }
     } catch (error) {
       console.error(error);
@@ -101,7 +153,20 @@ const EditScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.errorMessages}></View>
+      <View style={styles.errorMessages}>
+        {errorTitle ? (
+          <Text style={styles.errorMessage}>{errorTitle}</Text>
+        ) : null}
+        {errorContent ? (
+          <Text style={styles.errorMessage}>{errorContent}</Text>
+        ) : null}
+        {errorCategory ? (
+          <Text style={styles.errorMessage}>{errorCategory}</Text>
+        ) : null}
+        {errorImage ? (
+          <Text style={styles.errorMessage}>{errorImage}</Text>
+        ) : null}
+      </View>
 
       <Text style={styles.text}>Title</Text>
       <TextInput
@@ -149,7 +214,7 @@ const EditScreen = ({ navigation, route }) => {
       <View style={styles.imageContainer}>
         <Text style={styles.text}>Foto</Text>
         <ImageBackground
-          source={fieldSet.image ? { uri: fieldSet.image } : null}
+          source={fieldSet.image ? { uri: fieldSet.image_download_url } : null}
           style={styles.configImage}
         >
           <TouchableOpacity onPress={openCamera}>

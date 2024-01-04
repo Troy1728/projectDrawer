@@ -15,7 +15,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import CustomButton from "../../atoms/CustomButton";
 import stylesFile from "../../styles.js";
 import * as Crypto from "expo-crypto";
-import { auth } from "../../components/Firebase.jsx";
+import { FIREBASE_AUTH } from "../../components/Firebase.jsx";
 import LocationConfig from "../../components/Location.jsx";
 
 const hashPassword = async (password) => {
@@ -103,7 +103,7 @@ export default function Register({ navigation }) {
     try {
       const hashedPassword = await hashPassword(password);
       const userCredentail = await createUserWithEmailAndPassword(
-        auth,
+        FIREBASE_AUTH,
         email,
         hashedPassword
       );

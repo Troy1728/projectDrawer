@@ -21,7 +21,7 @@ const CustomButton = ({ title, buttonDesign, onPress }) => {
 
   return buttonDesign ? (
     <TouchableOpacity style={style} onPress={onPress}>
-      <Text style={[styles.buttonTitle]}>{title}</Text>
+      <Text style={[styles.buttonTitle]}>{title.toUpperCase()}</Text>
     </TouchableOpacity>
   ): null;  
 };
@@ -29,7 +29,7 @@ export default CustomButton;
 
 const styles = StyleSheet.create({
   button: {
-    width: Dimensions.get("screen").width - 20,
+    width: Dimensions.get("window").width - 20 ,
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
   },
   buttonTitle: {
     fontSize: 15,
-    fontWeight: "bold",
+    fontWeight: "900",
   },
 });

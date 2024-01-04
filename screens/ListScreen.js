@@ -13,8 +13,7 @@ import { Picker } from "@react-native-picker/picker";
 import { db } from "../components/Firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import CustomButton from "../atoms/CustomButton.js";
-import { ref, getDownloadURL, listAll, getStorage } from "firebase/storage";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry.js";
+import { ref, getDownloadURL, getStorage } from "firebase/storage";
 
 const List = ({ navigation }) => {
   const [loading, setLoading] = useState(false);

@@ -117,6 +117,7 @@ export default function Register({ navigation }) {
         firstname: firstName,
         lastname: lastName,
         password: hashedPassword,
+        role: "user",
         location: {
           city: city,
           postalCode: postalCode,

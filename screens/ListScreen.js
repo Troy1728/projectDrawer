@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Picker } from "@react-native-picker/picker";
-import { db } from "../components/Firebase";
+import { db, FIREBASE_AUTH } from "../components/Firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import CustomButton from "../atoms/CustomButton.js";
 import { ref, getDownloadURL, getStorage } from "firebase/storage";
@@ -20,46 +20,51 @@ const List = ({ navigation }) => {
   const [articles, setData] = useState([]);
   const [selectedType, setSelectedType] = useState(null);
 
-  const fetchData = async () => {
+  const getLoggedInUser = async () => {
+    const data = await getDocs(
+      query(
+        collection(db, "users"),
+        where("id", "==", FIREBASE_AUTH.currentUser.uid)
+      )
+    );
+    const role = data.docs[0].data().role;
+    if (role == "admin" || role == "dev") {
+      console.log("admin or dev");
+      fetchData();
+    } else if (role == "user") {
+      console.log("user");
+      fetchData(role);
+    }
+  };
+
+  const fetchData = async (role) => {
     setLoading(true);
     try {
-      const q = query(collection(db, "articles"));
       if (selectedType) {
-        const filterQ = query(
-          collection(db, "articles"),
-          where("category", "==", selectedType)
-        );
-        const snapshot = await getDocs(filterQ);
-        const articlesData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setData(articlesData);
-
-        if (articlesData.length > 0) {
-          const storage = getStorage();
-          for (let i = 0; i < articlesData.length; i++) {
-            const listRef = ref(storage, "images/" + articlesData[i].image);
-            const url = await getDownloadURL(listRef);
-            articlesData[i].image_download_url = url;
-          }
-          setData([...articlesData]);
+        if (role == "user") {
+          const filter = query(
+            collection(db, "articles"),
+            where("role", "==", role),
+            where("category", "==", selectedType)
+          );
+          getData(filter);
+        } else {
+          const filter = query(
+            collection(db, "articles"),
+            where("category", "==", selectedType)
+          );
+          getData(filter);
         }
       } else {
-        const snapshot = await getDocs(q);
-        const articlesData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setData(articlesData);
-        if (articlesData.length > 0) {
-          const storage = getStorage();
-          for (let i = 0; i < articlesData.length; i++) {
-            const listRef = ref(storage, "images/" + articlesData[i].image);
-            const url = await getDownloadURL(listRef);
-            articlesData[i].image_download_url = url;
-          }
-          setData([...articlesData]);
+        if (role == "user") {
+          const filter = query(
+            collection(db, "articles"),
+            where("user", "==", FIREBASE_AUTH.currentUser.uid),
+          );
+          getData(filter);
+        } else {
+          const filter = query(collection(db, "articles"));
+          getData(filter);
         }
       }
     } catch (error) {
@@ -69,6 +74,48 @@ const List = ({ navigation }) => {
       setLoading(false);
     }
   };
+
+  /* // Backup code for fetchData
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      if (selectedType) {
+        const filter = query(
+          collection(db, "articles"),
+          where("category", "==", selectedType)
+        );
+        getData(filter);
+      } else {
+        const filter = query(collection(db, "articles"));
+        getData(filter);
+      }
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  */
+
+  const getData = async (filter) => {
+    const snapshot = await getDocs(filter);
+    const articlesData = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setData(articlesData);
+    if (articlesData.length > 0) {
+      const storage = getStorage();
+      for (let i = 0; i < articlesData.length; i++) {
+        const listRef = ref(storage, "images/" + articlesData[i].image);
+        const url = await getDownloadURL(listRef);
+        articlesData[i].image_download_url = url;
+      }
+      setData([...articlesData]);
+    }
+  };
+
   const handleFilter = (itemValue) => {
     setSelectedType(itemValue);
   };
@@ -78,12 +125,12 @@ const List = ({ navigation }) => {
     : articles;
 
   useEffect(() => {
-    fetchData();
+    getLoggedInUser();
   }, []);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      fetchData();
+      getLoggedInUser();
     });
     return unsubscribe;
   }, [navigation]);

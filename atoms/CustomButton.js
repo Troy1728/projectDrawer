@@ -12,9 +12,9 @@ const CustomButton = ({ title, buttonDesign, onPress }) => {
     fullButton: {},
     halfButton: styles.halveButton,
     reverseButton: styles.reverseButton,
-    logoutButton: styles.reverseButton,
+    logoutButton: styles.logoutButton,
     paginateButton: styles.paginateButton,
-    artikelButton: styles.artikelButton,
+    articleButton: styles.articleButton,
   };
   
   const style = [styles.button, buttonStyles[buttonDesign]];
@@ -29,7 +29,7 @@ export default CustomButton;
 
 const styles = StyleSheet.create({
   button: {
-    width: Dimensions.get("window").width - 20 ,
+    width: Dimensions.get("window").width - 20,
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
   reverseButton: {
     backgroundColor: "#FFF",
     borderRadius: 10,
-    marginLeft: -2,
     marginBottom: -10,
   },
   paginateButton: {
@@ -55,9 +54,14 @@ const styles = StyleSheet.create({
     marginBottom: -10,
     width: 50,
   },
-  artikelButton: {
+  articleButton: {
     backgroundColor: "rgba(250,146,72,0.5)",
     borderStyle: "dashed",
+  },
+  logoutButton: {
+    backgroundColor: "#FFF",
+    borderColor: "#f00",
+    borderRadius: 10,
   },
   buttonTitle: {
     fontSize: 15,

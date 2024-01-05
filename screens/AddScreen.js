@@ -291,12 +291,12 @@ const Add = ({ navigation }) => {
 
         <CustomButton
           title="+ Arikel Toevoegen +"
-          buttonDesign="artikelButton"
+          buttonDesign="articleButton"
           onPress={addFieldSet}
         />
         <CustomButton
           title="- Artikel Verwijderen -"
-          buttonDesign="artikelButton"
+          buttonDesign="articleButton"
           onPress={removeFieldSet}
         />
 

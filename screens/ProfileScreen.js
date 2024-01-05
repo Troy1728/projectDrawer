@@ -194,27 +194,26 @@ const ProfileScreen = ({ navigation }) => {
               value={inputHouseNumber}
               onChangeText={(text) => setHouseNumber(text)}
             />
-            <CustomButton
-              title="Vind Locatie"
-              buttonDesign="reverseButton"
-              onPress={getLocation}
-            />
-            <CustomButton
-              title="Wijzigen"
-              buttonDesign="reverseButton"
-              onPress={updateUser}
-            />
           </View>
-
-          <View style={{ paddingBottom: 40 }}>
-            <CustomButton
-              title="Uitloggen"
-              buttonDesign="reverseButton"
-              onPress={signOutUser}
-            />
-          </View> 
         </View>
-       
+        <View style={{justifyContent: "center", paddingBottom: 20, paddingLeft: 10, alignContent: "space-between"}}>
+
+        <CustomButton
+          title="Vind Locatie"
+          buttonDesign="articleButton"
+          onPress={getLocation}
+        />
+        <CustomButton
+          title="Aanpassen"
+          buttonDesign="fullButton"
+          onPress={updateUser}
+        />
+        <CustomButton
+          title="Uitloggen"
+          buttonDesign="logoutButton"
+          onPress={signOutUser}
+        />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

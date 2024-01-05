@@ -75,29 +75,6 @@ const List = ({ navigation }) => {
     }
   };
 
-  /* // Backup code for fetchData
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      if (selectedType) {
-        const filter = query(
-          collection(db, "articles"),
-          where("category", "==", selectedType)
-        );
-        getData(filter);
-      } else {
-        const filter = query(collection(db, "articles"));
-        getData(filter);
-      }
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-  */
-
   const getData = async (filter) => {
     const snapshot = await getDocs(filter);
     const articlesData = snapshot.docs.map((doc) => ({

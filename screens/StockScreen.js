@@ -16,8 +16,7 @@ import { ref, getDownloadURL, getStorage } from "firebase/storage";
 import { StatusBar } from "expo-status-bar";
 import { Picker } from "@react-native-picker/picker";
 
-
-const StockScreen = ({navigation}) => {
+const StockScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [articles, setData] = useState([]);
   const [selectedType, setSelectedType] = useState(null);
@@ -26,22 +25,18 @@ const StockScreen = ({navigation}) => {
     setLoading(true);
     try {
       if (selectedType) {
-        
-          const filter = query(
-            collection(db, "articles"),
-            where("status", "==", "goed gekeurd"),
-            where("category", "==", selectedType)
-          );
-          getData(filter);
-        
+        const filter = query(
+          collection(db, "articles"),
+          where("status", "==", "goed gekeurd"),
+          where("category", "==", selectedType)
+        );
+        getData(filter);
       } else {
-        
-          const filter = query(
-            collection(db, "articles"),
-           where("status", "==", "goed gekeurd")
-          );
-          getData(filter);
-        
+        const filter = query(
+          collection(db, "articles"),
+          where("status", "==", "goed gekeurd")
+        );
+        getData(filter);
       }
     } catch (error) {
       console.error(error);
@@ -93,69 +88,70 @@ const StockScreen = ({navigation}) => {
       {loading ? (
         <ActivityIndicator size="small" color="#FA9248" />
       ) : (
-        <CustomButton
-          title="Donatie Toevoegen"
-          buttonDesign="fullButton"
-          onPress={() => navigation.navigate("AddScreen")}
-        />
-      )}
-      <View style={styles.filterContainer}>
-        <Picker
-          selectedValue={selectedType}
-          onValueChange={(itemValue) => handleFilter(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item style={styles.label} label="All" value={null} />
-          <Picker.Item style={styles.label} label="Kast" value="Kast" />
-          <Picker.Item style={styles.label} label="Stoel" value="Stoel" />
-          <Picker.Item style={styles.label} label="Tafel" value="Tafel" />
-          <Picker.Item style={styles.label} label="Zetel" value="Zetel" />
-        </Picker>
-      </View>
-
-      <FlatList
-        style={styles.posts}
-        data={filteredArticles}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: 20,
-                paddingVertical: 10,
-              }}
+        <View>
+          <View style={styles.filterContainer}>
+            <Picker
+              selectedValue={selectedType}
+              onValueChange={(itemValue) => handleFilter(itemValue)}
+              style={styles.picker}
             >
-              <View style={{ flexDirection: "column" }}>
-                <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.content}>
-                  {item.content.length > 20
-                    ? item.content.substring(0, 20) + "..."
-                    : item.content}
-                </Text>
-                <Text style={styles.content}>Categorie: {item.category}</Text>
-              </View>
-              <View style={{ flexDirection: "row" }}>
-                <Image
+              <Picker.Item style={styles.label} label="All" value={null} />
+              <Picker.Item style={styles.label} label="Kast" value="Kast" />
+              <Picker.Item style={styles.label} label="Stoel" value="Stoel" />
+              <Picker.Item style={styles.label} label="Tafel" value="Tafel" />
+              <Picker.Item style={styles.label} label="Zetel" value="Zetel" />
+            </Picker>
+          </View>
+
+          <FlatList
+            style={styles.posts}
+            data={filteredArticles}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.postContainer}>
+                <View
                   style={{
-                    width: 130,
-                    height: 130,
-                    paddingVertical: 5,
-                    borderRadius: 10,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
                   }}
-                  source={{ uri: item.image_download_url }}
+                >
+                  <View style={{ flexDirection: "column" }}>
+                    <Text style={styles.title}>{item.title}</Text>
+                    <Text style={styles.content}>
+                      {item.content.length > 20
+                        ? item.content.substring(0, 20) + "..."
+                        : item.content}
+                    </Text>
+                    <Text style={styles.content}>
+                      Categorie: {item.category}
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: "row" }}>
+                    <Image
+                      style={{
+                        width: 130,
+                        height: 130,
+                        paddingVertical: 5,
+                        borderRadius: 10,
+                      }}
+                      source={{ uri: item.image_download_url }}
+                    />
+                  </View>
+                </View>
+                <CustomButton
+                  title="Accepteren"
+                  buttonDesign="reverseButton"
+                  onPress={() =>
+                    navigation.navigate("AcceptenceScreen", { item })
+                  }
                 />
               </View>
-            </View>
-            <CustomButton
-              title="Bijwerken"
-              buttonDesign="reverseButton"
-              onPress={() => navigation.navigate("EditScreen", { item })}
-            />
-          </View>
-        )}
-      />
+            )}
+          />
+        </View>
+      )}
       <StatusBar style="auto" />
     </View>
   );
@@ -196,4 +192,3 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
-

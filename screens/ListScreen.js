@@ -59,7 +59,7 @@ const List = ({ navigation }) => {
         if (role == "user") {
           const filter = query(
             collection(db, "articles"),
-            where("user", "==", FIREBASE_AUTH.currentUser.uid),
+            where("user", "==", FIREBASE_AUTH.currentUser.uid)
           );
           getData(filter);
         } else {
@@ -172,11 +172,21 @@ const List = ({ navigation }) => {
                 />
               </View>
             </View>
-            <CustomButton
-              title="Bijwerken"
-              buttonDesign="reverseButton"
-              onPress={() => navigation.navigate("EditScreen", { item })}
-            />
+            {item.role == "user" ? (
+              <CustomButton
+                title="Bijwerken"
+                buttonDesign="reverseButton"
+                onPress={() => navigation.navigate("EditScreen", { item })}
+              />
+            ) : (
+              <CustomButton
+                title="Aanvaarden"
+                buttonDesign="reverseButton"
+                onPress={() =>
+                  navigation.navigate("AcceptenceScreen", { item })
+                }
+              />
+            )}
           </View>
         )}
       />

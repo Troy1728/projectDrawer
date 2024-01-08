@@ -9,6 +9,7 @@ import AddScreen from "./screens/AddScreen.js";
 import ConditionScreen from "./screens/ConditionScreen.js";
 import ProfileScreen from "./screens/ProfileScreen.js";
 import StockScreen from "./screens/StockScreen.js";
+import AcceptenceScreen from "./screens/AcceptenceScreen.js";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_AUTH } from "./components/Firebase.jsx";
@@ -52,6 +53,15 @@ function InsideLayout({ navigation }) {
         options={{
           header: ({ navigation }) => (
             <CustomHeader title="BIJWERKEN" navigation={navigation} />
+          ),
+        }}
+      />
+      <InsideStack.Screen
+        name="AcceptenceScreen"
+        component={AcceptenceScreen}
+        options={{
+          header: ({ navigation }) => (
+            <CustomHeader title="ACCEPTEREN" navigation={navigation} />
           ),
         }}
       />

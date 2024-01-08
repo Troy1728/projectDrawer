@@ -141,10 +141,10 @@ const StockScreen = ({ navigation }) => {
                   </View>
                 </View>
                 <CustomButton
-                  title="Accepteren"
+                  title="Meer info"
                   buttonDesign="reverseButton"
                   onPress={() =>
-                    navigation.navigate("AcceptenceScreen", { item })
+                    navigation.navigate("DetailScreen", { item })
                   }
                 />
               </View>

@@ -16,7 +16,7 @@ const CustomButton = ({ title, buttonDesign, onPress }) => {
     paginateButton: styles.paginateButton,
     articleButton: styles.articleButton,
   };
-  
+
   const style = [styles.button, buttonStyles[buttonDesign]];
 
   return buttonDesign ? (
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   buttonTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "900",
   },
 });

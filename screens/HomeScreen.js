@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, StyleSheet, Dimensions } from 'react-native';
 import React, {useState, useEffect } from 'react';
-import stylesFile from '../styles';
+import stylesFile from '../styles/styles';
 import { StatusBar } from 'expo-status-bar';
 import CustomButton from '../atoms/CustomButton';
 import { db, FIREBASE_AUTH } from '../components/Firebase';

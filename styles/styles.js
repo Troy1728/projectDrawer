@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  title: {
+  headerTitle: {
     fontFamily: "Roboto",
     fontSize: 36,
     fontWeight: "bold",
@@ -23,7 +23,10 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto",
     fontSize: 24,
     fontWeight: "bold",
-    color: "#FA9248",
+  },
+  content: {
+    paddingVertical: 5,
+    fontSize: 16,
   },
   buttonTitle: {
     fontSize: 15,

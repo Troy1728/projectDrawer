@@ -13,7 +13,7 @@ import { collection, doc, setDoc } from "firebase/firestore";
 import { db } from "../../components/Firebase.jsx";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import CustomButton from "../../atoms/CustomButton";
-import stylesFile from "../../styles.js";
+import stylesFile from "../../styles/styles.js";
 import * as Crypto from "expo-crypto";
 import { FIREBASE_AUTH } from "../../components/Firebase.jsx";
 import LocationConfig from "../../components/Location.jsx";

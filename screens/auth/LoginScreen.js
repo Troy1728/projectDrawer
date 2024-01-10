@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { FIREBASE_AUTH } from "../../components/Firebase.jsx";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import stylesFile from "../../styles.js";
+import stylesFile from "../../styles/styles.js";
 
 import * as Crypto from "expo-crypto";
 import CustomButton from "../../atoms/CustomButton.js";
